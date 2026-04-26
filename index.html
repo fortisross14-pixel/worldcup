@@ -280,7 +280,7 @@ body{background:var(--g);color:var(--txt);font-family:'DM Sans',sans-serif;font-
   </div>
 
 <!-- SAVE MANAGER MODAL -->
-<div id="save-manager-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px">
+<div id="save-manager-overlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px">
   <div style="background:#141414;border:1px solid #333;border-radius:12px;width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column">
     <div style="padding:16px 20px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--acc)">SAVE MANAGER</div>
@@ -1874,12 +1874,11 @@ function renderHistory(){
 
 // ── Named Save Slots ──────────────────────────────────────────────────────
 function openSaveManager(){
-  document.getElementById("save-manager-overlay").style.display="flex";
-  // Pre-fill name suggestion
+  document.getElementById("save-manager-overlay").classList.remove("hidden");
   document.getElementById("save-name-inp").value="World "+S.wcNumber+" — WC#"+S.wcNumber;
   renderSaveSlots();
 }
-function closeSaveManager(){document.getElementById("save-manager-overlay").style.display="none";}
+function closeSaveManager(){document.getElementById("save-manager-overlay").classList.add("hidden");}
 function saveNamedSlot(){
   const name=(document.getElementById("save-name-inp").value||"").trim();
   if(!name){toast("Enter a save name");return;}
