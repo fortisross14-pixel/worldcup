@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#c9a84c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WC Sim">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>World Cup Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#0e0e0e;--g2:#181818;--g3:#202020;--g4:#2a2a2a;--acc:#e8c84a;--acc2:#c9a82a;--acc3:#2a2000;--txt:#efefef;--txt2:#999;--txt3:#555;--red:#e05050;--grn:#4ec870;--blue:#5090e0;--purple:#a070e0;--orange:#e09050;--r:6px;--R:10px}
+body{background:var(--g);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
+.app{max-width:940px;margin:0 auto;padding:12px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 0 14px;border-bottom:1px solid #2a2a2a;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.logo{font-size:28px;color:var(--acc);line-height:1;font-family:'Bebas Neue',sans-serif;letter-spacing:.04em}
+.logo span{color:var(--txt3);font-size:12px;display:block;letter-spacing:.14em}
+.edition b{color:var(--acc);font-family:'Bebas Neue',sans-serif;font-size:18px;display:block;text-align:right}
+.edition{font-size:11px;color:var(--txt3);text-align:right}
+.header-right{display:flex;align-items:center;gap:6px}
+.tabs{display:flex;gap:3px;margin-bottom:14px;background:var(--g2);border-radius:var(--R);padding:4px;flex-wrap:wrap}
+.tab{flex:1;min-width:56px;padding:7px 3px;border:none;background:none;color:var(--txt3);cursor:pointer;border-radius:var(--r);font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.04em;transition:all .15s;white-space:nowrap}
+.tab.active{background:var(--acc);color:#111}
+.tab:hover:not(.active){color:var(--txt);background:var(--g3)}
+.panel{display:none}.panel.active{display:block}
+.btn{padding:8px 16px;border:none;border-radius:var(--r);cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.05em;transition:all .15s;white-space:nowrap}
+.btn-acc{background:var(--acc);color:#111}.btn-acc:hover{background:var(--acc2)}
+.btn-sec{background:var(--g3);color:var(--txt);border:1px solid #333}.btn-sec:hover{background:var(--g4)}
+.btn-grn{background:#1a4a2a;color:var(--grn);border:1px solid #2a6a3a}.btn-grn:hover{background:#1f5a32}
+.btn-blue{background:#0a1e3a;color:var(--blue);border:1px solid #1a3a6a}.btn-blue:hover{background:#0f2a4a}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.sec{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--txt3);margin:14px 0 7px;letter-spacing:.07em}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:3px;background:var(--g3);color:var(--txt2);border:1px solid #333}
+.badge-acc{background:var(--acc3);color:var(--acc);border-color:#5a4800}
+.empty{color:var(--txt3);font-size:13px;text-align:center;padding:30px}
+.fi{width:22px;height:15px;object-fit:cover;border-radius:2px;border:1px solid #2a2a2a;vertical-align:middle;margin-right:5px;display:inline-block}
+.fi-sm{width:18px;height:12px}
+.status{background:var(--g2);border:1px solid #2a2a2a;border-radius:var(--r);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.phase-lbl{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc)}
+.phase-info{font-size:12px;color:var(--txt2)}
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px}
+.popup-overlay.hidden{display:none}
+.popup{background:var(--g2);border:1px solid #3a3a3a;border-radius:var(--R);width:100%;max-width:480px;overflow:hidden}
+.popup-banner{padding:16px 20px;text-align:center;background:linear-gradient(135deg,#1a1500,#111)}
+.popup-winner{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--acc);line-height:1}
+.popup-score{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--txt);line-height:1;margin:4px 0}
+.popup-teams{display:flex;justify-content:space-between;font-size:12px;color:var(--txt2);padding:0 8px;margin-top:4px}
+.popup-stats{padding:14px 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:6px 10px;align-items:center}
+.psv{font-family:'Bebas Neue',sans-serif;font-size:18px}
+.psv.l{text-align:right}.psv.r{text-align:left}
+.psl{font-size:11px;color:var(--txt3);text-align:center}
+.popup-bar-wrap{grid-column:1/-1;display:flex;height:4px;border-radius:2px;overflow:hidden;margin:-2px 0}
+.popup-bar-l{background:var(--blue)}.popup-bar-r{background:var(--orange);flex:1}
+.popup-fx{padding:0 20px 8px;font-size:12px;color:var(--purple);line-height:1.7;text-align:center;min-height:14px}
+.popup-pens{font-size:12px;color:var(--acc);text-align:center;padding:0 20px 4px}
+.popup-footer{padding:12px 20px;border-top:1px solid #2a2a2a;display:flex;justify-content:center}
+.match-card{background:var(--g2);border:1px solid #252525;border-radius:var(--R);padding:12px 16px;margin-bottom:8px}
+.match-teams{display:flex;align-items:center;gap:8px;justify-content:center}
+.match-team{flex:1;text-align:center}
+.match-team-name{font-family:'Bebas Neue',sans-serif;font-size:14px;margin-top:4px}
+.match-ovr{font-size:20px;font-family:'Bebas Neue',sans-serif;color:var(--acc);margin-top:2px}
+.match-vs{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--txt3);min-width:40px;text-align:center}
+.res-card{background:var(--g2);border:1px solid #1e1e1e;border-radius:var(--r);padding:8px 12px;margin-bottom:5px;display:grid;grid-template-columns:1fr auto 1fr;gap:4px;align-items:center}
+.res-team{font-size:12px;display:flex;align-items:center;gap:4px}
+.res-team.r{justify-content:flex-end;text-align:right}
+.res-score{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--acc);text-align:center;white-space:nowrap}
+.res-meta{font-size:10px;color:var(--txt3);text-align:center;grid-column:1/-1}
+.stat-highlight{background:var(--g2);border:1px solid #252525;border-radius:var(--r);padding:12px 14px;text-align:center}
+.sh-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--acc)}
+.sh-lbl{font-size:11px;color:var(--txt3);margin-top:2px}
+.sh-sub{font-size:12px;color:var(--txt2);margin-top:4px}
+.groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(194px,1fr));gap:8px}
+.group-card{background:var(--g2);border:1px solid #252525;border-radius:var(--r);padding:9px}
+.group-title{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--acc);margin-bottom:5px}
+.gtable{width:100%;border-collapse:collapse;font-size:10px}
+.gtable th{color:var(--txt3);font-weight:400;padding:2px 2px;text-align:right}
+.gtable th:first-child{text-align:left}
+.gtable td{padding:3px 2px;text-align:right;border-top:1px solid #1e1e1e}
+.gtable td:first-child{text-align:left}
+.gtable tr.q1 td{color:var(--grn)}
+.gtable tr td{color:var(--txt1)}
+.tncell{display:flex;align-items:center;max-width:112px;overflow:hidden;white-space:nowrap}
+.bracket-scroll{overflow-x:auto}
+.bracket-round{margin-bottom:14px}
+.brt{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--acc2);margin-bottom:7px;border-bottom:1px solid #2a2a2a;padding-bottom:3px}
+.bracket-matches{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:5px}
+.bmatch{background:var(--g2);border:1px solid #222;border-radius:var(--r);padding:7px 11px}
+.bmatch-row{display:flex;align-items:center;padding:3px 0;gap:5px}
+.bmatch-row.winner{color:var(--acc)}
+.bmatch-row.loser{color:var(--txt3)}
+.bms{font-family:'Bebas Neue',sans-serif;font-size:15px;min-width:16px;text-align:right}
+.bmn{font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:8px;margin-bottom:16px}
+.star-card{background:var(--g2);border:1px solid #3a3200;border-radius:var(--R);padding:11px 13px}
+.tac-card-box{background:var(--g2);border:1px solid #0a1e3a;border-radius:var(--R);padding:11px 13px}
+.pill{font-family:'Bebas Neue',sans-serif;font-size:11px;padding:2px 7px;border-radius:3px;letter-spacing:.04em}
+.pill-star{background:#3a3000;color:var(--acc)}
+.pill-card{background:#07193a;color:var(--blue)}
+.pill-card-rare{background:#200a3a;color:#b47fef}
+.pill-card-legendary{background:#3a1800;color:var(--orange)}
+.pill-star-common{background:#3a3000;color:var(--acc)}
+.pill-star-rare{background:#200a3a;color:#b47fef}
+.pill-star-legendary{background:#3a1000;color:var(--orange)}
+.pill-GK{background:#1a0a3a;color:var(--purple)}
+.pill-DEF{background:#0a3020;color:var(--grn)}
+.pill-MID{background:#0a1a3a;color:var(--blue)}
+.pill-FWD{background:#3a1a00;color:var(--orange)}
+.sc-name{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--acc);margin:5px 0 2px}
+.sc-team{font-size:12px;color:var(--txt2);margin-bottom:4px;display:flex;align-items:center}
+.sc-career{font-size:11px;color:var(--txt3);margin-bottom:4px}
+.sc-career span{color:var(--grn)}
+.sc-fx{font-size:11px;color:var(--txt3);line-height:1.7}
+.sc-fx b{color:var(--grn)}
+.tac-name{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue);margin:5px 0 2px}
+.tac-desc{font-size:12px;color:var(--txt3);line-height:1.5}
+.wcs-pip{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap}
+.pip{width:10px;height:10px;border-radius:2px}
+.pip.played{background:var(--txt3)}.pip.active{background:var(--acc)}.pip.future{background:#222;border:1px solid #333}
+.rtable{width:100%;border-collapse:collapse;font-size:12px}
+.rtable th{color:var(--txt3);font-weight:400;padding:5px 7px;text-align:right;border-bottom:1px solid #222;font-size:10px;letter-spacing:.05em}
+.rtable th:first-child{text-align:left}
+.rtable td{padding:5px 7px;text-align:right;border-bottom:1px solid #1a1a1a}
+.rtable td:first-child{text-align:left}
+.rtable tr:hover td{background:#1c1c1c}
+.delta-pos{color:var(--grn)}.delta-neg{color:var(--red)}.delta-neu{color:var(--txt3)}
+.big-swing{background:#1a1300}
+.conf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(276px,1fr));gap:10px}
+.conf-card{background:var(--g2);border:1px solid #252525;border-radius:var(--R);padding:12px 14px}
+.conf-title{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--acc);margin-bottom:2px}
+.conf-slots{font-size:11px;color:var(--txt3);margin-bottom:7px}
+.qual-row{display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1a1a1a;font-size:12px;gap:6px}
+.qual-row:last-child{border:none}
+.qual-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-yes{background:var(--grn)}.dot-no{background:var(--red)}.dot-host{background:var(--acc)}
+.qual-name{flex:1}
+.qual-rating{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--txt2)}
+.host-banner{background:linear-gradient(135deg,#2a2000,#111);border:1px solid var(--acc);border-radius:var(--R);padding:22px;text-align:center;margin-bottom:14px}
+.host-title{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--txt3);letter-spacing:.1em;margin-bottom:6px}
+.host-name{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--acc);line-height:1;margin-top:4px}
+.hof-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.hof-card{background:var(--g2);border:1px solid #252525;border-radius:var(--r);padding:11px 13px}
+.hof-title{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--acc);margin-bottom:7px;border-bottom:1px solid #2a2a2a;padding-bottom:3px}
+.hof-row{display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1a1a1a;font-size:12px}
+.hof-row:last-child{border:none}
+.hof-rank{color:var(--txt3);width:16px;flex-shrink:0;font-size:11px}
+.hof-val{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--acc);margin-left:6px;white-space:nowrap}
+.history-card{background:var(--g2);border:1px solid #252525;border-radius:var(--r);padding:11px 13px;cursor:pointer;transition:border-color .15s;margin-bottom:7px}
+.history-card:hover{border-color:#444}
+.wc-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc)}
+.wc-winner{font-size:14px;font-weight:500;display:flex;align-items:center;gap:5px;margin-top:3px}
+.wc-meta{font-size:11px;color:var(--txt2);margin-top:3px}
+.hd{margin-top:9px;border-top:1px solid #252525;padding-top:9px;display:none}
+.hd.open{display:block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:5px}
+.srow{font-size:11px;color:var(--txt2)}.srow b{color:var(--txt)}
+.hist-sub{background:#1a1a1a;color:var(--txt2);border:1px solid #333}
+.hist-sub.active{background:var(--acc);color:#000;border-color:var(--acc)}border:1px solid var(--acc);border-radius:var(--R);padding:22px;text-align:center;margin-bottom:14px}
+.champ-title{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--acc);line-height:1}
+.champ-team{font-size:22px;font-weight:500;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px}
+.awards-block{display:flex;flex-direction:column;gap:6px;margin:12px auto;max-width:320px;text-align:left}
+.award-row{display:flex;align-items:center;gap:10px;background:#1a1600;border:1px solid #3a3000;border-radius:var(--r);padding:8px 10px}
+.award-icon{font-size:20px;width:26px;text-align:center;flex-shrink:0}
+.award-body{flex:1;min-width:0}
+.award-title{font-size:10px;color:var(--txt3);letter-spacing:.07em;font-family:'Bebas Neue',sans-serif}
+.award-name{font-size:14px;font-weight:500;color:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.award-meta{font-size:11px;color:var(--txt2)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow-y:auto}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--g2);border:1px solid #3a3a3a;border-radius:var(--R);padding:20px;width:100%;max-width:600px;margin:auto}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--acc);margin-bottom:2px}
+.modal-sub{font-size:12px;color:var(--txt2);margin-bottom:12px}
+.prog-row{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap}
+.prog-dot{flex:1;min-width:8px;height:4px;border-radius:2px;background:#333;transition:background .2s}
+.prog-dot.active{background:var(--acc)}.prog-dot.done{background:var(--grn)}
+.modal-sec{background:var(--g3);border-radius:var(--r);padding:13px;margin-bottom:9px}
+.modal-lbl{font-size:10px;color:var(--txt3);margin-bottom:4px;letter-spacing:.08em;text-transform:uppercase}
+.inp{width:100%;background:var(--g);border:1px solid #3a3a3a;border-radius:var(--r);color:var(--txt);padding:8px 11px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-top:2px}
+.inp:focus{border-color:var(--acc)}
+.fx-line{font-size:12px;color:var(--grn);padding:2px 0}
+.card-prev{background:var(--g);border:1px solid #1a3a6a;border-radius:var(--r);padding:9px 11px;margin-top:5px}
+.retire-notice{background:#1a0000;border:1px solid #3a0000;border-radius:var(--r);padding:9px 11px;margin-bottom:7px;font-size:12px;color:var(--red);line-height:1.6}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--g3);border:1px solid var(--acc);border-radius:var(--r);padding:10px 15px;font-size:13px;color:var(--txt);z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;max-width:300px;line-height:1.4}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">WORLD CUP<span>SIMULATOR</span></div>
+    <div class="header-right">
+      <div class="edition"><b id="wc-edition">EDITION #1</b>48 Teams · FIFA 2026</div>
+      <button class="btn btn-blue btn-sm" onclick="openSaveManager()">🗂️ Saves</button>
+      <button class="btn btn-blue btn-sm" onclick="exportSave()">📤 Export</button>
+      <label class="btn btn-blue btn-sm" style="cursor:pointer">📂 Load<input type="file" accept=".json" onchange="importSave(event)" style="display:none"></label>
+      <button class="btn btn-sm" style="background:#3a0a0a;color:#e05050;border:1px solid #6a1a1a" onclick="resetWorld()">🗑️ Reset</button>
+      <span id="last-saved" style="font-size:10px;color:var(--txt3);margin-left:4px"></span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('play')">Play</button>
+    <button class="tab" onclick="switchTab('results')">Results</button>
+    <button class="tab" onclick="switchTab('groups')">Groups</button>
+    <button class="tab" onclick="switchTab('bracket')">Bracket</button>
+    <button class="tab" onclick="switchTab('sc')">Stars & Cards</button>
+    <button class="tab" onclick="switchTab('nations')">Nations</button>
+    <button class="tab" onclick="switchTab('history')">History</button>
+  </div>
+  <div id="tab-play" class="panel active">
+    <div class="status">
+      <div><div class="phase-lbl" id="phase-label">READY TO START</div><div class="phase-info" id="phase-info">Press New World Cup to begin</div></div>
+      <div class="row">
+        <button class="btn btn-acc" id="btn-play" onclick="playNext()" disabled>PLAY MATCH</button>
+        <button class="btn btn-sec btn-sm" id="btn-newwc" onclick="startNewWC()">NEW WC</button>
+      </div>
+    </div>
+    <div id="play-area"></div>
+  </div>
+  <div id="tab-results" class="panel"><div id="results-container"><div class="empty">Play some matches to see results</div></div></div>
+  <div id="tab-groups" class="panel"><div id="groups-container"><div class="empty">Start a tournament to see groups</div></div></div>
+  <div id="tab-bracket" class="panel"><div class="bracket-scroll"><div id="bracket-container"><div class="empty">Knockout stage not started yet</div></div></div></div>
+  <div id="tab-sc" class="panel"><div id="sc-container"><div class="empty">Start a tournament to see Stars &amp; Cards</div></div></div>
+  <div id="tab-nations" class="panel">
+    <div class="row" style="margin-bottom:10px">
+      <div class="sec" style="margin:0">NATION RATINGS</div><div class="spacer"></div>
+      <select id="sort-teams" onchange="renderNations()" style="background:var(--g2);color:var(--txt);border:1px solid #333;border-radius:var(--r);padding:4px 7px;font-size:12px">
+        <option value="next">Next WC</option><option value="base">Base</option><option value="name">Name</option>
+      </select>
+    </div>
+    <div id="teams-container"><div class="empty">Start a tournament to see nations</div></div>
+  </div>
+  <div id="tab-history" class="panel">
+    <div class="row" style="margin-bottom:10px">
+      <div class="sec" style="margin:0">HALL OF FAME</div><div class="spacer"></div>
+      <span class="badge badge-acc" id="history-count">0 editions</span>
+    </div>
+    <div class="row" style="gap:6px;margin-bottom:10px">
+      <button class="btn btn-sm hist-sub active" id="hsub-teams" onclick="switchHistSub('teams')">🏟️ Teams</button>
+      <button class="btn btn-sm hist-sub" id="hsub-players" onclick="switchHistSub('players')">⭐ Players</button>
+    </div>
+    <div id="history-sub-teams"><div class="empty">No history yet.</div></div>
+    <div id="history-sub-players" style="display:none"><div class="empty">No history yet.</div></div>
+  </div>
+</div>
+
+<div class="popup-overlay hidden" id="popup-overlay">
+  <div class="popup">
+    <!-- STEP 1: Preview -->
+    <div id="pu-preview">
+      <div class="popup-banner" style="padding:14px 20px">
+        <div style="font-size:11px;color:var(--txt3);letter-spacing:.1em;margin-bottom:8px" id="pu-pre-round"></div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px">
+          <div id="pu-pre-t1" style="text-align:left"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--txt3)">VS</div>
+          <div id="pu-pre-t2" style="text-align:right"></div>
+        </div>
+      </div>
+      <div id="pu-pre-records" style="padding:10px 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:4px 10px;font-size:12px"></div>
+      <div class="popup-footer"><button class="btn btn-acc btn-sm" onclick="playConfirmed()">PLAY MATCH →</button></div>
+    </div>
+    <!-- STEP 2: Result -->
+    <div id="pu-result" style="display:none">
+      <div class="popup-banner">
+        <div class="popup-winner" id="pu-winner"></div>
+        <div class="popup-score" id="pu-score"></div>
+        <div class="popup-teams"><span id="pu-t1n"></span><span id="pu-t2n"></span></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:3px" id="pu-round"></div>
+      </div>
+      <div id="pu-live-ticker" style="display:none;padding:8px 16px;background:#111;border-bottom:1px solid #222"></div>
+      <div class="popup-stats" id="pu-stats"></div>
+      <div class="popup-pens" id="pu-pens"></div>
+      <div class="popup-fx" id="pu-fx"></div>
+      <div class="popup-footer"><button class="btn btn-acc btn-sm" onclick="closePopup()">CONTINUE →</button></div>
+    </div>
+  </div>
+
+<!-- SAVE MANAGER MODAL -->
+<div id="save-manager-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#141414;border:1px solid #333;border-radius:12px;width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column">
+    <div style="padding:16px 20px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--acc)">SAVE MANAGER</div>
+      <button onclick="closeSaveManager()" style="background:none;border:none;color:var(--txt3);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:12px 20px;border-bottom:1px solid #1a1a1a;display:flex;gap:8px">
+      <input id="save-name-inp" class="inp" placeholder="Save name (e.g. World 1 - WC#6)" style="flex:1;font-size:13px">
+      <button class="btn btn-acc btn-sm" onclick="saveNamedSlot()">💾 Save</button>
+    </div>
+    <div id="save-slots-list" style="overflow-y:auto;flex:1;padding:8px 0"></div>
+  </div>
+</div>
+
+</div>
+
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">PRE-TOURNAMENT</div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="prog-row" id="prog-row"></div>
+    <div id="modal-body"></div>
+    <div class="row" style="margin-top:12px">
+      <div class="spacer"></div>
+      <button class="btn btn-sec btn-sm" id="modal-skip" onclick="modalSkipAll()" style="display:none">SKIP NAMING</button>
+      <button class="btn btn-acc" id="modal-btn" onclick="modalNext()">NEXT →</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CONF_SLOTS={UEFA:16,CONMEBOL:6,CONCACAF:6,CAF:9,AFC:9,OFC:2};
+const ALL_NATIONS=[
+  // UEFA (25 nations)
+  {name:"France",cc:"fr",base:93,conf:"UEFA",always:true},
+  {name:"Spain",cc:"es",base:90,conf:"UEFA",always:true},
+  {name:"Germany",cc:"de",base:95,conf:"UEFA",always:true},
+  {name:"England",cc:"gb-eng",base:90,conf:"UEFA",always:true},
+  {name:"Portugal",cc:"pt",base:87,conf:"UEFA",always:true},
+  {name:"Netherlands",cc:"nl",base:90,conf:"UEFA",always:true},
+  {name:"Italy",cc:"it",base:95,conf:"UEFA",always:true},
+  {name:"Belgium",cc:"be",base:85,conf:"UEFA",always:true},
+  {name:"Croatia",cc:"hr",base:82,conf:"UEFA"},
+  {name:"Denmark",cc:"dk",base:81,conf:"UEFA"},
+  {name:"Serbia",cc:"rs",base:79,conf:"UEFA"},
+  {name:"Switzerland",cc:"ch",base:80,conf:"UEFA"},
+  {name:"Poland",cc:"pl",base:78,conf:"UEFA"},
+  {name:"Ukraine",cc:"ua",base:78,conf:"UEFA"},
+  {name:"Austria",cc:"at",base:77,conf:"UEFA"},
+  {name:"Sweden",cc:"se",base:77,conf:"UEFA"},
+  {name:"Czech Republic",cc:"cz",base:76,conf:"UEFA"},
+  {name:"Turkey",cc:"tr",base:76,conf:"UEFA"},
+  {name:"Norway",cc:"no",base:75,conf:"UEFA"},
+  {name:"Hungary",cc:"hu",base:74,conf:"UEFA"},
+  {name:"Slovakia",cc:"sk",base:73,conf:"UEFA"},
+  {name:"Scotland",cc:"gb-sct",base:73,conf:"UEFA"},
+  {name:"Romania",cc:"ro",base:72,conf:"UEFA"},
+  {name:"Greece",cc:"gr",base:71,conf:"UEFA"},
+  {name:"Ireland",cc:"ie",base:70,conf:"UEFA"},
+  // CONMEBOL (10 nations)
+  {name:"Brazil",cc:"br",base:95,conf:"CONMEBOL",always:true},
+  {name:"Argentina",cc:"ar",base:93,conf:"CONMEBOL",always:true},
+  {name:"Uruguay",cc:"uy",base:90,conf:"CONMEBOL",always:true},
+  {name:"Colombia",cc:"co",base:82,conf:"CONMEBOL"},
+  {name:"Chile",cc:"cl",base:79,conf:"CONMEBOL"},
+  {name:"Ecuador",cc:"ec",base:76,conf:"CONMEBOL"},
+  {name:"Peru",cc:"pe",base:74,conf:"CONMEBOL"},
+  {name:"Venezuela",cc:"ve",base:70,conf:"CONMEBOL"},
+  {name:"Paraguay",cc:"py",base:68,conf:"CONMEBOL"},
+  {name:"Bolivia",cc:"bo",base:65,conf:"CONMEBOL"},
+  // CONCACAF (8 nations)
+  {name:"Mexico",cc:"mx",base:82,conf:"CONCACAF",always:true},
+  {name:"USA",cc:"us",base:80,conf:"CONCACAF",always:true},
+  {name:"Canada",cc:"ca",base:78,conf:"CONCACAF"},
+  {name:"Costa Rica",cc:"cr",base:72,conf:"CONCACAF"},
+  {name:"Panama",cc:"pa",base:68,conf:"CONCACAF"},
+  {name:"Honduras",cc:"hn",base:66,conf:"CONCACAF"},
+  {name:"Jamaica",cc:"jm",base:64,conf:"CONCACAF"},
+  {name:"El Salvador",cc:"sv",base:62,conf:"CONCACAF"},
+  // CAF (12 nations)
+  {name:"Morocco",cc:"ma",base:82,conf:"CAF",always:true},
+  {name:"Senegal",cc:"sn",base:81,conf:"CAF"},
+  {name:"Ivory Coast",cc:"ci",base:80,conf:"CAF"},
+  {name:"Nigeria",cc:"ng",base:80,conf:"CAF"},
+  {name:"Egypt",cc:"eg",base:80,conf:"CAF"},
+  {name:"Cameroon",cc:"cm",base:78,conf:"CAF"},
+  {name:"Ghana",cc:"gh",base:77,conf:"CAF"},
+  {name:"Algeria",cc:"dz",base:77,conf:"CAF"},
+  {name:"Tunisia",cc:"tn",base:75,conf:"CAF"},
+  {name:"Mali",cc:"ml",base:73,conf:"CAF"},
+  {name:"South Africa",cc:"za",base:71,conf:"CAF"},
+  {name:"DR Congo",cc:"cd",base:70,conf:"CAF"},
+  // AFC (12 nations)
+  {name:"Japan",cc:"jp",base:81,conf:"AFC"},
+  {name:"South Korea",cc:"kr",base:80,conf:"AFC"},
+  {name:"Australia",cc:"au",base:76,conf:"AFC"},
+  {name:"Iran",cc:"ir",base:75,conf:"AFC"},
+  {name:"Saudi Arabia",cc:"sa",base:72,conf:"AFC"},
+  {name:"Uzbekistan",cc:"uz",base:70,conf:"AFC"},
+  {name:"Qatar",cc:"qa",base:68,conf:"AFC"},
+  {name:"Iraq",cc:"iq",base:67,conf:"AFC"},
+  {name:"UAE",cc:"ae",base:66,conf:"AFC"},
+  {name:"Jordan",cc:"jo",base:65,conf:"AFC"},
+  {name:"Oman",cc:"om",base:63,conf:"AFC"},
+  {name:"Bahrain",cc:"bh",base:62,conf:"AFC"},
+  // OFC (4 nations)
+  {name:"New Zealand",cc:"nz",base:67,conf:"OFC"},
+  {name:"Fiji",cc:"fj",base:58,conf:"OFC"},
+  {name:"Papua New Guinea",cc:"pg",base:55,conf:"OFC"},
+  {name:"Solomon Islands",cc:"sb",base:53,conf:"OFC"}
+];
+const TAC_CARDS=[
+  // COMMON (20) — blue
+  {id:"physique",tier:"common",name:"Great Physique",desc:"+8 PHY all tournament, +5 DEF in knockouts.",fx:{phy:8},ko:{def:5}},
+  {id:"consolidated",tier:"common",name:"Consolidated Team",desc:"First goal conceded each match cancelled. +5 DEF.",fx:{def:5},cancel_goal:true},
+  {id:"clinical",tier:"common",name:"Clinical Finishers",desc:"+9 ATT when level or winning.",fx:{},clinical_att:9},
+  {id:"ironwall",tier:"common",name:"Iron Wall",desc:"+10 DEF in every knockout match.",fx:{},ko:{def:10}},
+  {id:"gegenpres",tier:"common",name:"Gegenpressing",desc:"+6 ATT and +4 PHY all tournament.",fx:{att:6,phy:4}},
+  {id:"veteran",tier:"common",name:"Veteran Leadership",desc:"+8 MOR all tournament.",fx:{mor:8}},
+  {id:"setmaster",tier:"common",name:"Set Piece Masters",desc:"+10 SPC, 30% bonus set-piece goal per match.",fx:{spc:10},setpiece:true},
+  {id:"depth",tier:"common",name:"Squad Depth",desc:"+5 PHY and +4 ATT from quarter-finals onwards.",fx:{},late:{att:4,phy:5}},
+  {id:"underdog",tier:"common",name:"Underdog Spirit",desc:"If outrated — +12 ATT and +7 DEF.",fx:{},underdog:{att:12,def:7}},
+  {id:"tiki",tier:"common",name:"Possession Game",desc:"+6 MOR and +5 SPC.",fx:{mor:6,spc:5}},
+  {id:"counterattack",tier:"common",name:"Counter Attack",desc:"+10 ATT and −4 DEF.",fx:{att:10,def:-4}},
+  {id:"highpress",tier:"common",name:"High Press",desc:"+5 ATT and +5 PHY.",fx:{att:5,phy:5}},
+  {id:"parkbus",tier:"common",name:"Park the Bus",desc:"+12 DEF and −5 ATT. Second goal conceded cancelled.",fx:{def:12,att:-5},cancel_goal2:true},
+  {id:"youngblood",tier:"common",name:"Young Blood",desc:"+7 MOR and +4 ATT. +10 MOR in knockouts.",fx:{mor:7,att:4},ko:{mor:3}},
+  {id:"homecrowd",tier:"common",name:"Home Crowd",desc:"+6 MOR and +4 PHY.",fx:{mor:6,phy:4}},
+  {id:"deadball",tier:"common",name:"Dead Ball Specialist",desc:"+8 SPC, 20% extra set-piece goal.",fx:{spc:8},setpiece:true},
+  {id:"ironmen",tier:"common",name:"Iron Men",desc:"+6 PHY and +4 DEF. Max 3 goals conceded per match.",fx:{phy:6,def:4},cap_ga:3},
+  {id:"tactgenius",tier:"common",name:"Tactical Genius",desc:"+5 to ALL stats.",fx:{att:5,def:5,phy:5,spc:5,mor:5}},
+  {id:"lategear",tier:"common",name:"Extra Gear",desc:"+8 ATT and +8 MOR from Round of 16 onwards.",fx:{},late:{att:8,mor:8}},
+  {id:"momentum",tier:"common",name:"Momentum",desc:"Each consecutive win adds +2 MOR (max +10).",fx:{},momentum:true},
+  // RARE (8) — purple
+  {id:"blitzkrieg",tier:"rare",name:"Blitzkrieg",desc:"+18 ATT all tournament. Always scores 1 bonus goal per match.",fx:{att:18},bonus_goal:true},
+  {id:"fortress",tier:"rare",name:"Fortress",desc:"+15 DEF and +10 PHY. Max 2 goals conceded per match.",fx:{def:15,phy:10},cap_ga:2},
+  {id:"totaalvoetbal",tier:"rare",name:"Totaalvoetbal",desc:"+12 to ATT, DEF and MOR. Players cover every position.",fx:{att:12,def:12,mor:12}},
+  {id:"tikiadvanced",tier:"rare",name:"Tiki-Taka Elite",desc:"+14 SPC, +10 MOR, +8 ATT. Set-piece goal 50% of matches.",fx:{spc:14,mor:10,att:8},setpiece:true},
+  {id:"pressingmaster",tier:"rare",name:"Pressing Machine",desc:"+10 ATT, +10 PHY, +8 DEF. Opponent ATT −6.",fx:{att:10,phy:10,def:8},debuff:{att:6}},
+  {id:"counterelite",tier:"rare",name:"Elite Counter",desc:"+15 ATT and −5 DEF. Scores 1 bonus goal when winning.",fx:{att:15,def:-5},counter_bonus:true},
+  {id:"setpiecegod",tier:"rare",name:"Set Piece God",desc:"+18 SPC. 70% chance of a set-piece goal each match.",fx:{spc:18},setpiece_rare:true},
+  {id:"ironfortress",tier:"rare",name:"Iron Fortress",desc:"+20 DEF in knockouts. First goal conceded cancelled every match.",fx:{def:5},ko:{def:15},cancel_goal:true},
+  // LEGENDARY (4) — orange
+  {id:"legendarywall",tier:"legendary",name:"Legendary Iron Wall",desc:"Opposing team: 80% chance 0 goals, 15% chance 1 goal, 5% chance 2 goals. Maximum 2 goals conceded.",fx:{def:20},legendary_wall:true},
+  {id:"goldengen",tier:"legendary",name:"Golden Generation",desc:"All stats set to between 92-97, regardless of base rating.",fx:{},golden_gen:true},
+  {id:"jogobonito",tier:"legendary",name:"Jogo Bonito",desc:"Always scores 2 additional goals on top of base result.",fx:{att:15},jogo_bonito:true},
+  {id:"tactrevolution",tier:"legendary",name:"Tactical Revolution",desc:"For each stat, takes the higher of own stat vs opponent stat minus 1.",fx:{},tact_revolution:true}
+];
+// Star/card nation weight tiers: top=10, mid=4, low=1
+const NATION_STAR_WEIGHTS={
+  "Brazil":10,"Germany":10,"Italy":10,"Argentina":10,"Netherlands":10,"England":10,"Spain":10,"France":10,
+  "Uruguay":4,"Mexico":4,"Portugal":4,"Belgium":4,"Switzerland":4,"Sweden":4,"Hungary":4,"Austria":4,
+  "Poland":4,"Denmark":4,"Norway":4,"Japan":4,"South Korea":4,"Morocco":4,"Egypt":4,
+  "Colombia":4,"Croatia":4,"Serbia":4,"Czech Republic":4,"Chile":4,"Senegal":4,"Nigeria":4,"Ivory Coast":4,
+  "USA":3,"Ukraine":3,"Turkey":3,"Ghana":3,"Cameroon":3,"Algeria":3,"Ecuador":3
+};
+function nationStarWeight(name){return NATION_STAR_WEIGHTS[name]||1;}
+function weightedPickNation(pool){
+  const w=pool.map(n=>nationStarWeight(n.name));
+  const tot=w.reduce((a,b)=>a+b,0);let r=Math.random()*tot;
+  for(let i=0;i<pool.length;i++){r-=w[i];if(r<=0)return pool[i];}
+  return pool[pool.length-1];
+}
+// Per-country star name database [firstNames, lastNames]
+const STAR_NAMES={
+  "France":[["Laurent","Edouard","Luc","Philippe","Michel","Thierry","Hugo","Antoine","Karim","Kylian","Ousmane","Marcus","Randal"],["Blanc","Martin","Lambert","Baudoin","Dupont","Bernard","Renard","Petit","Leblanc","Girard","Henry","Zidane"]],
+  "Spain":[["Raúl","Fernando","Sergio","Xavi","Andrés","Álvaro","David","Pedro","Marcos","Carlos","Jordi","Dani"],["García","Martínez","López","Ramos","Torres","Sánchez","Pérez","Fernández","Moreno","Alonso","Puyol","Xavi"]],
+  "Germany":[["Thomas","Lukas","Toni","Sami","Mesut","Marco","Leroy","Niklas","Jamal","Florian","Robin","Leon"],["Müller","Kroos","Klose","Rüdiger","Kimmich","Neuer","Hummels","Lahm","Schweinsteiger","Gnabry","Wirtz","Götze"]],
+  "England":[["Harry","Jack","Phil","Bukayo","Marcus","Declan","Kieran","Kyle","Jude","Luke","John","Gary"],["Kane","Rashford","Saka","Foden","Bellingham","Rice","Walker","Trippier","Dunk","Shaw","Neville","Lineker"]],
+  "Italy":[["Gianluigi","Nicolò","Federico","Lorenzo","Ciro","Marco","Giacomo","Luca","Roberto","Alessandro","Gianluca","Fabio"],["Donnarumma","Barella","Chiesa","Pellegrini","Immobile","Verratti","Tonali","Jorginho","Mancini","Bastoni","Bonucci","Cannavaro"]],
+  "Brazil":[["Vinicius","Rodrygo","Endrick","Raphinha","Casemiro","Marquinhos","Gabriel","Bruno","Richarlison","Militão","Thiago","Lucas"],["Silva","Santos","Fernandes","Alves","Guimarães","Jesus","Firmino","Neto","Costa","Barbosa","Teixeira","Moraes"]],
+  "Argentina":[["Lionel","Julián","Lautaro","Paulo","Rodrigo","Nicolás","Gonzalo","Carlos","Leandro","Ángel","Roberto","Diego"],["Messi","Álvarez","Martínez","Dybala","De Paul","González","Higuaín","Tévez","Paredes","Di María","Otamendi","Acuña"]],
+  "Netherlands":[["Virgil","Frenkie","Cody","Denzel","Jurriën","Wout","Memphis","Stefan","Daley","Georginio","Davy","Tijjani"],["van Dijk","de Jong","Gakpo","Dumfries","Timber","Weghorst","Depay","de Vrij","Blind","Wijnaldum","Klaassen","Aké"]],
+  "Portugal":[["Cristiano","Bruno","Rafael","Bernardo","João","Nuno","Rúben","Gonçalo","Diogo","André","Ricardo","Luís"],["Ronaldo","Fernandes","Leão","Silva","Cancelo","Dias","Mendes","Dalot","Costa","Guedes","Quaresma","Figo"]],
+  "Belgium":[["Kevin","Romelu","Thibaut","Eden","Axel","Jan","Leandro","Yannick","Dodi","Jeremy","Toby","Thomas"],["De Bruyne","Lukaku","Courtois","Hazard","Witsel","Vertonghen","Tielemans","Carrasco","Doku","Openda","Alderweireld","Meunier"]],
+  "Uruguay":[["Darwin","Federico","Rodrigo","Mathías","Manuel","Giorgian","Edinson","Luis","Diego","Álvaro","Martín","Sebastián"],["Núñez","Valverde","Bentancur","Araújo","Ugarte","De Arrascaeta","Cavani","Suárez","Godín","Páez","Cáceres","Coates"]],
+  "Mexico":[["Hirving","Raúl","Andrés","Guillermo","Carlos","Javier","Héctor","Edson","Luis","Roberto","Javier","César"],["Lozano","Jiménez","Guardado","Ochoa","Vela","Moreno","Álvarez","Chávez","Reyes","Alvarado","Marquez","Hernández"]],
+  "Morocco":[["Hakim","Achraf","Youssef","Romain","Nayef","Azzedine","Bilal","Sofyan","Noussair","Yassine","Abde","Tarik"],["Ziyech","Hakimi","En-Nesyri","Saïss","Aguerd","Ounahi","El Khannous","Amrabat","Mazraoui","Bounou","Ezzalzouli","Dari"]],
+  "Japan":[["Takumi","Hiroki","Wataru","Daichi","Kaoru","Ritsu","Yuto","Shogo","Takehiro","Junya","Keito","Takefusa"],["Minamino","Ito","Endo","Kamada","Mitoma","Doan","Tomiyasu","Taniguchi","Suzuki","Kubo","Maeda","Nakayama"]],
+  "South Korea":[["Heung-min","Hwang","Lee","Kim","Cho","Kwon","Ji","Jin-Sub","Oh","Seung-Gyu","Min-Jae","Jae-Sung"],["Son","Hee-Chan","Jae-Sung","Min-Jae","In-Beom","Ui-Jo","Seung-Gyu","Dong-Gyeong","Hyeon-Gyu","Young-Gwon","Tae-Hwan","Chang-Hoon"]],
+  "Egypt":[["Mohamed","Ahmed","Trezeguet","Omar","Mostafa","Amr","Ramadan","Mahmoud","Karim","Zizo","Marwan","Salah"],["Salah","El-Shenawy","Hegazi","Elneny","Hamdi","Marmoush","Trezeguet","Ashraf","Kahraba","Sobhi","Gaber","Shahat"]],
+  "Poland":[["Robert","Piotr","Bartosz","Matty","Arkadiusz","Kamil","Grzegorz","Jakub","Damian","Wojciech","Rafał","Sebastian"],["Lewandowski","Zieliński","Szymański","Cash","Milik","Glik","Krychowiak","Kiwior","Szymański","Szczęsny","Piszczek","Błaszczykowski"]],
+  "Denmark":[["Christian","Pierre-Emile","Simon","Rasmus","Andreas","Yussuf","Viktor","Mathias","Jonas","Kasper","Joakim","Mikkel"],["Eriksen","Højbjerg","Kjær","Højlund","Cornelius","Poulsen","Kristiansen","Møller","Wind","Schmeichel","Andersen","Damsgaard"]],
+  "Norway":[["Erling","Martin","Victor","Alexander","Julian","Sander","Jørgen","Fredrik","Patrick","Ole","Vegar","Alexander"],["Haaland","Ødegaard","Solbakken","Sørloth","Johnsen","Berge","Strand Larsen","Aursnes","Thorsby","Nusa","Botheim","Ostigård"]],
+  "Sweden":[["Zlatan","Alexander","Dejan","Viktor","Emil","Robin","Jordan","Ken","Joel","Albin","Gustav","Kristoffer"],["Ibrahimović","Isak","Kulusevski","Gyökeres","Forsberg","Quaison","Larsson","Sema","Ekdal","Elanga","Karlsson","Olsson"]],
+  "Colombia":[["Luis","James","Cucho","Rafael","Davinson","Daniel","Yerry","Miguel","Óscar","Falcao","Juan","Edwin"],["Díaz","Rodríguez","Hernández","Santos","Sánchez","Mina","Ospina","Barrios","Uribe","Falcao","Cuadrado","Córdoba"]],
+  "Senegal":[["Sadio","Kalidou","Cheikhou","Édouard","Boulaye","Ismaïla","Nampalys","Nicolas","Idrissa","Pape","Bamba","Lamine"],["Mané","Koulibaly","Kouyaté","Mendy","Dia","Sarr","Mendy","Jackson","Gueye","Mbaye Niang","Diatta","Diallo"]],
+  "Nigeria":[["Victor","Samuel","Cyriel","Alex","Kelechi","Leon","Frank","Joe","Aribo","Super","Ola","Ndidi"],["Osimhen","Chukwueze","Balogun","Troost-Ekong","Iheanacho","Balogun","Onyeka","Lookman","Ndidi","Bassey","Awaziem","Aribo"]],
+  "Croatia":[["Luka","Mateo","Duje","Ivan","Mario","Ante","Marcelo","Lovro","Nikola","Bruno","Josip","Domagoj"],["Modrić","Kovačić","Ćaleta-Car","Gvardiol","Pašalić","Kramarić","Brozović","Ivanušec","Vlašić","Perišić","Moro","Šutalo"]],
+  "Serbia":[["Dušan","Aleksander","Sergej","Filip","Nemanja","Luka","Nikola","Ivan","Strahinja","Sasa","Milan","Andrijana"],["Vlahović","Mitrović","Milinković-Savić","Kostić","Milenković","Jović","Gudelj","Ilić","Pavlović","Tadić","Živković","Ristić"]],
+  "Portugal_default":[["João","Nuno","Gonçalo","André","Ricardo"],["Costa","Silva","Santos","Ferreira","Dias"]]
+};
+function getStarName(nationName){
+  const db=STAR_NAMES[nationName];
+  if(db){return pick(db[0])+" "+pick(db[1]);}
+  // fallback: generic football-sounding names by confederation
+  const n=ALL_NATIONS.find(x=>x.name===nationName);
+  const conf=n?.conf||"UEFA";
+  const fallbacks={
+    UEFA:[["Stefan","Andrei","Viktor","Marco","Ivan","Lukas"],["Kovač","Popescu","Novák","Rossi","Müller","Schmidt"]],
+    CONMEBOL:[["Carlos","Diego","Pablo","Rodrigo","Matías"],["García","López","Vargas","Castro","Ramírez"]],
+    CONCACAF:[["José","Miguel","Roberto","Juan","Carlos"],["Hernández","Martínez","López","Sánchez","Gutiérrez"]],
+    CAF:[["Oumar","Kwame","Yusuf","Moussa","Ibrahim"],["Diallo","Koné","Traoré","Coulibaly","Camara"]],
+    AFC:[["Kenji","Min","Yusuf","Rashid","Ahmad"],["Tanaka","Kim","Al-Dawsari","Hassan","Suzuki"]],
+    OFC:[["James","Thomas","Sam","Luke","Ben"],["Smith","Brown","Williams","Jones","Cooper"]]
+  };
+  const fb=fallbacks[conf]||fallbacks.UEFA;
+  return pick(fb[0])+" "+pick(fb[1]);
+}
+// Star effects by position AND tier
+// Common: modest boost, needs a good team. Rare: strong, decisive. Legendary: game-changing.
+const POS_FX={
+  GK:{
+    common:{lines:["DEF +8, MOR +4","~50% chance to block an opponent goal"],fx:{def:8,mor:4},save_chance:0.50},
+    rare:{lines:["DEF +14, MOR +8","~70% chance to block an opponent goal","Boosts team PHY +5"],fx:{def:14,mor:8,phy:5},save_chance:0.70},
+    legendary:{lines:["DEF +20, MOR +12, PHY +8","~85% chance to block an opponent goal","Concede max 1 goal per match"],fx:{def:20,mor:12,phy:8},save_chance:0.85,cap_ga:1}
+  },
+  DEF:{
+    common:{lines:["DEF +10, PHY +5, SPC +3","~35% chance to block a goal"],fx:{def:10,phy:5,spc:3},save_chance:0.35},
+    rare:{lines:["DEF +16, PHY +10, SPC +8","~55% chance to block a goal","Can score from set pieces (20%)"],fx:{def:16,phy:10,spc:8},save_chance:0.55,spc_goal:0.20},
+    legendary:{lines:["DEF +22, PHY +14, SPC +12, MOR +8","~70% chance to block a goal","Scores from set pieces (40%)","Max 1 goal conceded per match"],fx:{def:22,phy:14,spc:12,mor:8},save_chance:0.70,spc_goal:0.40,cap_ga:1}
+  },
+  MID:{
+    common:{lines:["ATT +6, DEF +5, MOR +6","All-round boost"],fx:{att:6,def:5,mor:6},goal_chance:0.18},
+    rare:{lines:["ATT +12, DEF +8, MOR +10, PHY +6","Guaranteed 1 goal per tournament run","30% chance of bonus goal per match"],fx:{att:12,def:8,mor:10,phy:6},goal_chance:0.30},
+    legendary:{lines:["ATT +18, DEF +12, MOR +15, PHY +10","50% chance of bonus goal per match","Lifts entire team: +8 to all stats"],fx:{att:18,def:12,mor:15,phy:10},goal_chance:0.50,team_boost:8}
+  },
+  FWD:{
+    common:{lines:["ATT +9, SPC +4","45% chance of bonus goal per match"],fx:{att:9,spc:4},goal_chance:0.45},
+    rare:{lines:["ATT +16, SPC +8, MOR +6","Guaranteed 1 bonus goal per match","65% chance of a second bonus goal"],fx:{att:16,spc:8,mor:6},goal_chance:1.0,goal_chance2:0.65},
+    legendary:{lines:["ATT +22, SPC +12, MOR +12, PHY +8","Guaranteed 2 bonus goals per match","80% chance of a third bonus goal","Makes any team a title contender"],fx:{att:22,spc:12,mor:12,phy:8},goal_chance:2.0,goal_chance2:0.80}
+  }
+};
+// Helper: get the right tier fx for a star
+function getStarFx(star){
+  const pos=POS_FX[star?.pos];if(!pos)return null;
+  return pos[star?.tier||"common"]||pos.common;
+}
+const COUNTRY_NAMES={
+  // CONMEBOL
+  "Brazil":["R. Firmino","G. Jesus","Vinicius Jr.","Rodrygo","Casemiro","Thiago S.","Marquinhos","Alisson","Raphinha","B. Guimarães","Endrick","Savinho"],
+  "Argentina":["L. Messi","J. Álvarez","Lautaro M.","Di María","Mac Allister","De Paul","Molina","Acuña","Dybala","E. Fernández","Lo Celso","Tagliafico"],
+  "Uruguay":["D. Núñez","F. Valverde","Bentancur","R. Araújo","J. Giménez","M. Ugarte","Pellistri","B. Araujo","G. De Arrascaeta","Olivera"],
+  "Colombia":["L. Díaz","J. Cuadrado","R. Falcao","J. Arias","D. Ospina","Y. Mina","M. Uribe","C. Cuesta","E. Cardona","S. Córdoba"],
+  "Chile":["A. Vidal","C. Bravo","E. Vargas","A. Sánchez","G. Medel","G. Maripán","M. Díaz","Ben Brereton","J. Aránguiz","N. Castillo"],
+  "Ecuador":["E. Valencia","P. Estupiñán","Á. Preciado","M. Caicedo","G. Plata","J. Cifuentes","F. Hincapié","L. Chala","D. Palacios"],
+  "Peru":["P. Guerrero","J. Carrillo","E. Flores","C. Cueva","A. Zambrano","M. Trauco","R. Tapia","Lapadula","A. Valera"],
+  "Venezuela":["S. Rondón","Y. Soteldo","J. Martínez","W. Osorio","R. Peñaranda","C. Cásseres","J. Herrera","L. González"],
+  "Paraguay":["M. Almirón","R. Sanabria","J. Benítez","J. Alonso","G. Gómez","Ángel Romero","Oscar Romero","F. Balbuena"],
+  "Bolivia":["M. Moreno","J. Saucedo","H. Bejarano","C. Lampe","L. Algarañaz","F. Saavedra","O. Villarroel"],
+  // CONCACAF
+  "Mexico":["H. Lozano","R. Jiménez","A. Guardado","J. Herrera","G. Ochoa","C. Vela","H. Moreno","E. Álvarez","L. Chávez","R. Alvarado","O. Pineda"],
+  "USA":["C. Pulisic","B. McKennie","T. Adams","G. Reyna","M. Turner","S. Dest","Y. Musah","F. Balogun","F. Weah","J. Ream","A. Robinson"],
+  "Canada":["A. Davies","J. David","T. Buchanan","M. Johnston","S. Larin","S. Adekugbe","D. Henry","C. Eustaquio","I. Corbeanu","B. Cornelius"],
+  "Costa Rica":["K. Navas","J. Venegas","C. Umaña","R. Tejeda","J. Calvo","B. Ruiz","J. Campbell","A. Contreras","R. Torres"],
+  "Panama":["R. Torres","A. Murillo","E. Davis","A. Tejada","J. Anderson","J. Góndola","M. Carrasquilla","A. Avilés"],
+  "Honduras":["A. Elis","R. Quioto","D. Acosta","E. Espinoza","R. López","J. Benguché","O. Boniek","M. Beckeles"],
+  "Jamaica":["L. Bailey","D. Antonio","C. Palmer","B. Pinnock","A. Blake","R. Lowe","S. Antonio","A. Mundle","R. Decordova-Reid"],
+  "El Salvador":["N. Pérez","R. Rodríguez","E. Larin","K. Renderos","B. Alvarado","J. Landaverde","M. Cáder","C. Portillo"],
+  // UEFA
+  "France":["K. Mbappé","A. Griezmann","O. Dembélé","A. Tchouaméni","A. Camavinga","R. Saliba","D. Upamecano","T. Hernández","M. Maignan","C. Camavinga","B. Diallo","Nkunku"],
+  "Spain":["Pedri","Gavi","Rodri","L. Yamal","M. Morata","F. Torres","S. Ramos","D. Carvajal","Á. Morata","Ferran T.","Fabian R.","A. Unai"],
+  "Germany":["T. Müller","L. Wirtz","J. Musiala","K. Havertz","K. Gnabry","J. Kimmich","A. Rüdiger","M. Neuer","T. Kroos","L. Goretzka","D. Raum","Süle"],
+  "England":["H. Kane","J. Bellingham","B. Saka","P. Foden","M. Rashford","D. Rice","K. Walker","K. Trippier","L. Dunk","J. Pickford","T. Alexander-Arnold","B. White"],
+  "Portugal":["C. Ronaldo","B. Fernandes","R. Leão","Bernardo S.","J. Cancelo","R. Dias","N. Mendes","D. Dalot","V. Neves","M. Nunes","Gonçalo R.","João F."],
+  "Netherlands":["V. van Dijk","F. de Jong","C. Gakpo","D. Dumfries","X. Timber","N. Ake","W. Weghorst","M. Depay","J. Veerman","T. Reijnders","B. Frimpong"],
+  "Belgium":["K. De Bruyne","R. Lukaku","T. Courtois","T. Hazard","A. Tielemans","J. Vertonghen","J. Dendoncker","Y. Carrasco","L. Openda","A. Doku","W. Faes"],
+  "Italy":["G. Donnarumma","B. Barella","K. Acerbi","F. Chiesa","C. Immobile","M. Verratti","G. Di Lorenzo","L. Pellegrini","L. Tonali","R. Frattesi","G. Retegui","C. Fagioli"],
+  "Croatia":["L. Modrić","M. Kovačić","I. Gvardiol","B. Šutalo","D. Livaković","A. Kramarić","B. Petković","J. Moro","L. Ivanušec","M. Brozović","M. Perišić"],
+  "Denmark":["C. Eriksen","P. Schmeichel","S. Kjær","J. Andersen","A. Hojbjerg","R. Højlund","A. Cornelius","Y. Poulsen","A. Skov Olsen","V. Kristiansen"],
+  "Serbia":["D. Vlahović","N. Milenković","A. Mitrović","S. Milinkovic-Savic","F. Kostic","N. Gudelj","I. Ilić","M. Živković","S. Tadić"],
+  "Switzerland":["G. Xhaka","X. Shaqiri","Y. Sommer","M. Akanji","R. Freuler","B. Embolo","R. Vargas","S. Okafor","N. Elvedi","A. Zuber"],
+  "Poland":["R. Lewandowski","P. Zielinski","W. Szymanski","B. Moder","M. Cash","G. Bereszyński","K. Świderski","D. Szymański","J. Milik"],
+  "Ukraine":["A. Zinchenko","M. Mudryk","H. Sudakov","O. Dovbyk","V. Mykolenko","M. Lunin","V. Zabarny","I. Zubkov","A. Tsygankov"],
+  "Austria":["M. Arnautović","D. Alaba","C. Baumgartner","K. Laimer","M. Sabitzer","P. Wimmer","N. Seiwald","M. Lienhart","P. Lainer"],
+  "Sweden":["Z. Ibrahimović","A. Isak","D. Kulusevski","V. Gyökeres","E. Forsberg","R. Quaison","K. Olsson","J. Elanga","A. Ekdal","E. Krafth"],
+  "Czech Republic":["T. Souček","P. Schick","A. Hlozek","V. Coufal","L. Krejčí","J. Kuchta","M. Barák","J. Doleček","M. Červeny"],
+  "Turkey":["H. Çalhanoğlu","B. Yılmaz","M. Güler","F. Akturkoglu","Z. Çelik","A. Kabak","K. Ayhan","I. Günok","A. Yazıcı"],
+  "Norway":["E. Haaland","M. Ødegaard","V. Solbakken","A. Thorsby","C. Ajer","E. Botheim","S. Berge","J. Strand Larsen","P. Piroe","O. Nusa"],
+  "Hungary":["D. Szoboszlai","R. Sallai","A. Szalai","P. Gulácsi","A. Fiola","W. Orbán","R. Schäfer","Z. Nagy","B. Kleinheisler"],
+  "Slovakia":["M. Hamšík","M. Duda","R. Mak","I. Schranz","S. Lobotka","L. Šatka","P. Pekarík","J. Boženík","T. Suslov"],
+  "Scotland":["A. Robertson","K. Tierney","C. Adams","S. McTominay","J. McGinn","R. Christie","L. Ferguson","G. Hendry","B. Cooper"],
+  "Romania":["N. Stanciu","F. Chipciu","R. Marin","V. Mogoș","A. Rațiu","R. Drăgușin","B. Mihai","D. Alibec","G. Ioniță"],
+  "Greece":["G. Masouras","T. Bouchalakis","V. Pavlidis","P. Retsos","K. Fortounis","M. Tzavellas","D. Pelkas","C. Mavropanos","T. Bakasetas"],
+  "Ireland":["S. Coleman","J. Hendrick","M. Obafemi","C. Brady","A. Browne","C. Ogbene","L. Doherty","T. McDermott","J. Cullen"],
+  // CAF
+  "Morocco":["H. Ziyech","A. Hakimi","Y. En-Nesyri","R. Amrabat","S. Amrabat","N. Aguerd","R. Ounahi","B. Bounou","I. Diaz","A. Sabiri","M. Dari"],
+  "Senegal":["S. Mané","K. Coulibaly","I. Gueye","E. Mendy","K. Mbaye Niang","P. Gueye","B. Diallo","I. Sarr","N. Jackson","B. Diatta"],
+  "Ivory Coast":["S. Touré","W. Zaha","F. Koné","M. Sangaré","S. Aurier","E. Gradel","S. Fofana","J. Kessié","A. Traoré","K. Kalou"],
+  "Nigeria":["V. Osimhen","S. Chukwueze","A. Balogun","W. Troost-Ekong","C. Bassey","A. Lookman","F. Onyeka","B. Iheanacho","J. Aribo","O. Ndidi"],
+  "Egypt":["M. Salah","M. El-Shenawy","A. Hegazi","A. Elneny","M. Hamdi","T. Ashraf","A. Kahraba","O. Marmoush","A. Sharara","M. Trezeguet"],
+  "Cameroon":["V. Aboubakar","A. Anguissa","K. Toko Ekambi","G. Mbarga","N. Nkoulou","P. Onana","B. Moumi Ngamaleu","J. Bassogog","H. Zambo"],
+  "Ghana":["A. Ayew","J. Ayew","T. Partey","K. Asante","D. Kudus","T. Lamptey","A. Djiku","L. Benson","I. Dawuni","O. Semenyo"],
+  "Algeria":["R. Mahrez","I. Slimani","Y. Brahimi","I. Bennacer","A. Mandi","Z. Atal","B. Guedioura","S. Feghouli","A. Bentaleb"],
+  "Tunisia":["W. Khazri","E. Meriah","D. Bronn","A. Ben Romdhane","Y. Msakni","M. Sassi","H. Jaziri","I. Sfar","M. Ben Hamida"],
+  "Mali":["M. Coulibaly","K. Traoré","A. Kouyaté","M. Diallo","I. Traoré","H. Kouyaté","A. Maïga","B. Kouyaté","K. Konaté"],
+  "South Africa":["P. Tau","L. Baloyi","R. Zungu","T. Hlatshwayo","L. Foster","K. Dolly","V. Billiat","S. Shalulile","T. Zwane"],
+  "DR Congo":["K. Batshuayi","C. Bope","P. Makiese","D. Lilepo","J. Mbokani","Y. Luyindama","G. Mputu","A. Kakuta","J. Mpoku"],
+  // AFC
+  "Japan":["S. Minamino","H. Ito","W. Endo","D. Kamada","A. Mitoma","Y. Tomiyasu","S. Taniguchi","K. Itakura","T. Morita","D. Suzuki","K. Ueda","R. Doan"],
+  "South Korea":["H. Son","J. Lee","J. Hwang","K. Kim","Y. Cho","J. Hwang","H. Kwon","S. Jung","B. Kim","K. Lee","D. Oh","J. Moon"],
+  "Australia":["M. Leckie","A. Hrustic","R. Geria","M. Goodwin","T. Ryan","M. Rowles","J. Irvine","C. Atkinson","C. Bolic","J. Nisbet"],
+  "Iran":["M. Taremi","A. Ansarifard","S. Hajsafi","S. Pouraliganji","M. Hosseini","E. Jahanbakhsh","K. Rezaeian","A. Torabi","S. Shojaei"],
+  "Saudi Arabia":["S. Al-Dawsari","F. Al-Buraikan","M. Al-Abed","Y. Al-Shahrani","A. Al-Buraikan","M. Kanno","A. Malki","H. Al-Tambakti"],
+  "Uzbekistan":["A. Shomurodov","J. Khamdamov","D. Mirzaev","U. Razzakov","J. Tursunov","B. Alijonov","S. Masharipov","O. Yusupov"],
+  "Qatar":["A. Afif","H. Al-Haydos","A. Al-Ali","B. Al-Rawi","P. Correia","H. Al-Ismaeel","R. Salman","A. Hassan","A. Alaaeldin"],
+  "Iraq":["A. Adnan","S. Mahmoud","B. Abdullah","J. Ali","A. Ibrahim","M. Al-Zubaidi","H. Al-Saedi","A. Hamid","K. Hashem"],
+  "UAE":["A. Mabkhout","S. Al-Kathiri","I. Al-Hamadi","M. Al-Shamsi","K. Al-Hammadi","F. Al-Mushaifri","O. Abdulrahman","M. Rashid"],
+  "Jordan":["Y. Al-Naimat","B. Bani Yaseen","O. Al-Smadi","H. Bani-Attiyeh","N. Al-Dardour","M. Abu Zema","A. Shehab"],
+  "Oman":["A. Al-Mukhaini","I. Al-Farsi","M. Al-Gheilani","A. Fawzi","S. Al-Mandhar","F. Al-Ajmi","J. Al-Yahmadi"],
+  "Bahrain":["M. Marhoon","A. Al-Malki","C. Ramdan","I. Abdullateef","S. Al-Asfoor","B. Kubbar","Y. Abdulla"],
+  // OFC
+  "New Zealand":["T. Wood","M. Garbett","T. James","C. Mustoe","N. Dekker","O. Key","A. Cooper","C. Penney","S. Cain"],
+  "Fiji":["R. Singh","B. Kumar","S. Nadan","A. Prasad","S. Cakacaka","K. Deo","N. Tuilagi"],
+  "Papua New Guinea":["G. Kaka","F. Warisan","J. Tokave","M. Koraia","A. Magi","R. Leka"],
+  "Solomon Islands":["T. Fa'arodo","J. Wate","E. Waroa","B. Maemae","J. Hilly","R. Toata"]
+};
+function getPool(conf,name){
+  return COUNTRY_NAMES[name]||["A. Player","B. Smith","C. Johnson","D. Williams","E. Brown"];
+}
+
+// STATE
+let S={teams:[],groups:[],groupMatches:[],knockoutRounds:[],phase:"idle",scorers:{},champion:null,wcNumber:1,activeStars:[],tacCards:[],roundReached:{},hostNation:null,qualifiedNations:[],allMatchResults:[],teamGoals:{},teamGoalsConceded:{},teamShots:{},teamPoss:{},teamMatchCount:{}};
+let allHistory=[],teamMeta={};
+let modalQueue=[],modalIdx=0,pendingNewStars=[],pendingCards=[],pendingQualified=[];
+let popupCb=null;
+
+const fi=(cc,sm)=>`<img class="fi${sm?' fi-sm':''}" src="https://flagcdn.com/w40/${cc}.png" onerror="this.style.display='none'">`;
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const shuffle=arr=>{let a=[...arr];for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function ovr(s){return Math.round((s.att+s.def+s.phy+s.spc+s.mor)/5);}function fmt1(v){return Number.isInteger(v)?v:v.toFixed(1);}
+function genStats(base){const v=()=>rand(-7,7);return{att:clamp(base+v(),40,99),def:clamp(base+v(),40,99),phy:clamp(base+v(),40,99),spc:clamp(base+v(),40,99),mor:50};}// MOR always starts at 50; boosted dynamically by results
+function switchTab(t){document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');const tabs=['play','results','groups','bracket','sc','nations','history'];const idx=tabs.indexOf(t);if(idx>=0)document.querySelectorAll('.tab')[idx].classList.add('active');}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3200);}
+
+// SAVE/LOAD
+// ── IndexedDB Save System ─────────────────────────────────────────────────
+const DB_NAME='wcsim',DB_VER=1,STORE='saves',AUTO_KEY='__autosave__';
+let _db=null;
+function getDB(){
+  if(_db)return Promise.resolve(_db);
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>{e.target.result.createObjectStore(STORE,{keyPath:'key'});};
+    req.onsuccess=e=>{_db=e.target.result;res(_db);};
+    req.onerror=()=>rej(req.error);
+  });
+}
+function dbPut(key,data){return getDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put({key,...data});tx.oncomplete=res;tx.onerror=()=>rej(tx.error);}));}
+function dbGet(key){return getDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(STORE,'readonly');const req=tx.objectStore(STORE).get(key);req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);}));}
+function dbDelete(key){return getDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(key);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);}));}
+function dbAll(){return getDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(STORE,'readonly');const req=tx.objectStore(STORE).getAll();req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);}));}
+
+function buildSaveData(){
+  return{
+    version:9,
+    savedAt:Date.now(),
+    wcNumber:S.wcNumber,
+    activeStars:S.activeStars,
+    allHistory,
+    teamMeta,
+    // Full active tournament state
+    activeTournament:{
+      phase:S.phase,
+      teams:S.teams,
+      groups:S.groups,
+      groupMatches:S.groupMatches,
+      knockoutRounds:S.knockoutRounds,
+      scorers:S.scorers,
+      champion:S.champion,
+      roundReached:S.roundReached,
+      hostNation:S.hostNation,
+      qualifiedNations:S.qualifiedNations,
+      allMatchResults:S.allMatchResults,
+      teamGoals:S.teamGoals,
+      teamGoalsConceded:S.teamGoalsConceded,
+      teamShots:S.teamShots,
+      teamPoss:S.teamPoss,
+      teamMatchCount:S.teamMatchCount,
+      tacCards:S.tacCards
+    }
+  };
+}
+function restoreSaveData(d){
+  if(d.allHistory)allHistory=d.allHistory;
+  if(d.teamMeta)teamMeta=d.teamMeta;
+  if(d.wcNumber)S.wcNumber=d.wcNumber;
+  if(d.activeStars)S.activeStars=d.activeStars;
+  if(d.activeTournament){
+    const t=d.activeTournament;
+    S.phase=t.phase||"idle";
+    S.teams=t.teams||[];
+    S.groups=t.groups||[];
+    S.groupMatches=t.groupMatches||[];
+    S.knockoutRounds=t.knockoutRounds||[];
+    S.scorers=t.scorers||{};
+    S.champion=t.champion||null;
+    S.roundReached=t.roundReached||{};
+    S.hostNation=t.hostNation||null;
+    S.qualifiedNations=t.qualifiedNations||[];
+    S.allMatchResults=t.allMatchResults||[];
+    S.teamGoals=t.teamGoals||{};
+    S.teamGoalsConceded=t.teamGoalsConceded||{};
+    S.teamShots=t.teamShots||{};
+    S.teamPoss=t.teamPoss||{};
+    S.teamMatchCount=t.teamMatchCount||{};
+    S.tacCards=t.tacCards||[];
+  }
+  initMeta();
+  relinkTeams();
+}
+function saveLS(){
+  const data=buildSaveData();
+  data.key=AUTO_KEY;
+  dbPut(AUTO_KEY,data).then(()=>updateSavedStamp()).catch(()=>toast("Auto-save failed"));
+}
+function autoSave(){saveLS();}
+function updateSavedStamp(){
+  const el=document.getElementById("last-saved");
+  if(el)el.textContent="Saved "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+}
+function loadLS(){
+  dbGet(AUTO_KEY).then(d=>{
+    if(!d)return;
+    restoreSaveData(d);
+    if(d.savedAt){const el=document.getElementById("last-saved");if(el)el.textContent="Saved "+new Date(d.savedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
+    resumeUI();
+    renderAll();
+  }).catch(()=>{});
+}
+function exportSave(){
+  const data=buildSaveData();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="wc_save_"+Date.now()+".json";a.click();
+  toast("Save exported!");
+}
+function importSave(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      // Full reset first
+      S.teams=[];S.groups=[];S.groupMatches=[];S.knockoutRounds=[];
+      S.phase="idle";S.scorers={};S.champion=null;S.roundReached={};
+      S.hostNation=null;S.qualifiedNations=[];S.allMatchResults=[];
+      S.teamGoals={};S.teamGoalsConceded={};S.teamShots={};S.teamPoss={};S.teamMatchCount={};
+      allHistory=[];teamMeta={};
+      restoreSaveData(d);
+      // Restore UI to match saved phase
+      document.getElementById("wc-edition").textContent="EDITION #"+S.wcNumber;
+      if(S.phase==="idle"||S.phase==="done"){
+        document.getElementById("btn-play").disabled=true;
+        document.getElementById("btn-newwc").disabled=false;
+        document.getElementById("play-area").innerHTML="";
+        setPhase("idle","Press NEW WC to begin");
+      } else if(S.phase==="groups"){
+        document.getElementById("btn-play").disabled=false;
+        document.getElementById("btn-newwc").disabled=true;
+        const rem=S.groupMatches.filter(m=>!m.played).length;
+        setPhase("groups",rem+" group matches remaining");
+        showUpcoming();
+      } else if(S.phase==="knockout"){
+        document.getElementById("btn-play").disabled=false;
+        document.getElementById("btn-newwc").disabled=true;
+        const round=S.knockoutRounds[S.knockoutRounds.length-1];
+        const rem=round?round.matches.filter(m=>!m.played).length:0;
+        setPhase("knockout",(round?.name||"Knockout")+" — "+rem+" left");
+        showUpcoming();
+      }
+      renderHistory();renderNations();renderResults();renderSC();renderGroups();renderBracket();
+      if(d.savedAt){const el=document.getElementById("last-saved");if(el)el.textContent="Saved "+new Date(d.savedAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
+      saveLS();
+      toast("Loaded! WC #"+S.wcNumber+(S.phase!=="idle"?" — resuming tournament":"")+".");
+    }catch(err){toast("Import failed: "+err.message);}
+  };
+  r.readAsText(file);
+}
+function resetWorld(){
+  if(!confirm("Reset everything? This will wipe all history, stars, and nation ratings. This cannot be undone."))return;
+  // Clear autosave from IndexedDB
+  dbDelete(AUTO_KEY).catch(()=>{});
+  // Reset all in-memory state
+  allHistory=[];
+  teamMeta={};
+  S.wcNumber=1;
+  S.activeStars=[];
+  S.tacCards=[];
+  S.teams=[];S.groups=[];S.groupMatches=[];S.knockoutRounds=[];
+  S.phase="idle";S.scorers={};S.champion=null;S.roundReached={};
+  S.hostNation=null;S.qualifiedNations=[];S.allMatchResults=[];
+  S.teamGoals={};S.teamGoalsConceded={};S.teamShots={};S.teamPoss={};S.teamMatchCount={};
+  // Rebuild nation meta from scratch
+  initMeta();
+  // Reset UI
+  document.getElementById("wc-edition").textContent="EDITION #1";
+  document.getElementById("btn-play").disabled=true;
+  document.getElementById("btn-newwc").disabled=false;
+  document.getElementById("play-area").innerHTML="";
+  setPhase("idle","Press NEW WC to begin");
+  renderHistory();renderNations();renderResults();renderSC();renderGroups();renderBracket();
+  toast("World reset. Ready for WC #1!");
+}
+// Gaussian randomness: Box-Muller, sigma=3.5 so ±12 is ~3.4 sigma (rare), ±5 is common
+function gaussRand(sigma){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)*sigma;}
+function clampedGauss(sigma,max){return Math.max(-max,Math.min(max,Math.round(gaussRand(sigma))));}
+
+// History component: 0-20 pts based on recent WC performance across all editions
+function calcHistoryComponent(name){
+  if(!allHistory.length)return 0;
+  // allHistory is stored newest-first (unshift), so slice(0,5) = 5 most recent
+  const recent=allHistory.slice(0,5);
+  const pts={"Winner":20,"Final":15,"Semi-finals":10,"3rd Place":8,"4th Place":5,"Quarter-finals":6,"Round of 16":3,"Round of 32":1};
+  let totalW=0,totalScore=0;
+  recent.forEach((h,i)=>{
+    const w=recent.length-i;// most recent = highest weight
+    totalW+=w;
+    const reached=(h.roundReached&&h.roundReached[name])||"Group";
+    totalScore+=w*(pts[reached]||0);
+  });
+  const maxPossible=totalW*20;
+  return maxPossible>0?Math.round((totalScore/maxPossible)*20):0;
+}
+function initMeta(){
+  ALL_NATIONS.forEach(n=>{
+    const hist=calcHistoryComponent(n.name);
+    if(!teamMeta[n.name]){
+      const noise=clampedGauss(3.5,12);
+      const cur=Math.round(clamp(n.base*0.8+hist,50,99)+noise);
+      teamMeta[n.name]={base:n.base,historyPts:hist,prevRating:cur,nextRating:cur,titles:0,finals:0,semis:0,quarters:0,groupExits:0};
+    }else{
+      teamMeta[n.name].base=n.base;// always use canonical base
+      teamMeta[n.name].historyPts=hist;
+      if(!teamMeta[n.name].nextRating)teamMeta[n.name].nextRating=n.base;
+      if(!teamMeta[n.name].prevRating)teamMeta[n.name].prevRating=n.base;
+    }
+  });
+}
+
+function recalcNextRating(name){
+  const n=ALL_NATIONS.find(x=>x.name===name);if(!n)return;
+  const m=teamMeta[name];if(!m)return;
+  const hist=calcHistoryComponent(name);
+  const target=Math.round(n.base*0.8+hist);
+  const current=m.nextRating||target;
+  const reversion=Math.round((target-current)*0.3);
+  const noise=clampedGauss(3.5,12);
+  const next=Math.round(clamp(target+reversion+noise,50,99));
+  m.historyPts=hist;
+  m.prevRating=current;
+  m.nextRating=next;
+}
+function resumeUI(){
+  document.getElementById("wc-edition").textContent="EDITION #"+S.wcNumber;
+  if(S.phase==="groups"){
+    document.getElementById("btn-play").disabled=false;
+    document.getElementById("btn-newwc").disabled=true;
+    const rem=S.groupMatches.filter(m=>!m.played).length;
+    setPhase("groups",rem+" group matches remaining");
+    showUpcoming();
+  }else if(S.phase==="knockout"){
+    document.getElementById("btn-play").disabled=false;
+    document.getElementById("btn-newwc").disabled=true;
+    const round=S.knockoutRounds[S.knockoutRounds.length-1];
+    const rem=round?round.matches.filter(m=>!m.played).length:0;
+    setPhase("knockout",(round?.name||"Knockout")+" — "+rem+" left");
+    showUpcoming();
+  }else{
+    document.getElementById("btn-play").disabled=true;
+    document.getElementById("btn-newwc").disabled=false;
+    setPhase("idle","Press NEW WC to begin");
+  }
+}
+function renderAll(){
+  renderHistory();renderNations();renderResults();renderSC();renderGroups();renderBracket();
+}
+function init(){
+  initMeta();
+  document.getElementById("wc-edition").textContent="EDITION #"+S.wcNumber;
+  renderHistory();
+  loadLS();
+  // Register service worker
+  if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+}
+
+// QUALIFYING
+function runQualifying(hostName,starTeams,cardTeams){
+  // Build the set of guaranteed qualifiers
+  const guaranteed=new Set();
+  guaranteed.add(hostName);
+  ALL_NATIONS.filter(n=>n.always).forEach(n=>guaranteed.add(n.name));
+  starTeams.forEach(n=>guaranteed.add(n));
+  cardTeams.forEach(n=>guaranteed.add(n));
+
+  const hostConf=ALL_NATIONS.find(n=>n.name===hostName)?.conf||"UEFA";
+  // Slots per confederation (host reduces their conf by 1)
+  const slots={...CONF_SLOTS};
+  if(slots[hostConf]>0) slots[hostConf]--;
+
+  // Per-confederation qualifying
+  const confResults={};
+  const qualified=new Set(guaranteed);
+
+  Object.keys(slots).forEach(conf=>{
+    const pool=ALL_NATIONS.filter(n=>n.conf===conf);
+    // How many guaranteed are already in from this conf?
+    const alreadyIn=pool.filter(n=>guaranteed.has(n.name));
+    const remaining=pool.filter(n=>!guaranteed.has(n.name));
+    const need=Math.max(0,slots[conf]-alreadyIn.length);
+    weightedPick(remaining,need).forEach(n=>qualified.add(n.name));
+    confResults[conf]={pool};
+  });
+
+  // Build final list of 48, sorted: guaranteed first then by rating
+  let finalList=ALL_NATIONS.filter(n=>qualified.has(n.name));
+  // If over 48 (guaranteed > 48), trim non-always from lowest rating
+  if(finalList.length>48){
+    finalList.sort((a,b)=>{
+      const ra=teamMeta[a.name]?.nextRating||a.base;
+      const rb=teamMeta[b.name]?.nextRating||b.base;
+      return rb-ra;
+    });
+    finalList=finalList.slice(0,48);
+  }
+  // If under 48, fill with highest-rated non-qualified
+  if(finalList.length<48){
+    const extra=ALL_NATIONS.filter(n=>!qualified.has(n.name))
+      .sort((a,b)=>(teamMeta[b.name]?.nextRating||b.base)-(teamMeta[a.name]?.nextRating||a.base))
+      .slice(0,48-finalList.length);
+    extra.forEach(n=>qualified.add(n.name));
+    finalList.push(...extra);
+  }
+
+  return{qualified,confResults,finalList:finalList.slice(0,48)};
+}
+function weightedPick(pool,n){const chosen=[];const avail=[...pool];for(let i=0;i<Math.min(n,avail.length);i++){const w=avail.map(t=>(teamMeta[t.name]?.nextRating||t.base)**2);const tot=w.reduce((a,b)=>a+b,0);let r=Math.random()*tot;let idx=0;for(let j=0;j<w.length;j++){r-=w[j];if(r<=0){idx=j;break;}}chosen.push(avail[idx]);avail.splice(idx,1);}return chosen;}
+
+function getEff(team,isKO=false,depth=0){
+  let{att,def,phy,spc,mor}=team;
+  // Star tier-aware effects
+  if(team.star){
+    const sfx=getStarFx(team.star);
+    if(sfx?.fx){att+=sfx.fx.att||0;def+=sfx.fx.def||0;phy+=sfx.fx.phy||0;spc+=sfx.fx.spc||0;mor+=sfx.fx.mor||0;}
+    // Legendary MID team boost applies to all stats
+    if(sfx?.team_boost){att+=sfx.team_boost;def+=sfx.team_boost;phy+=sfx.team_boost;spc+=sfx.team_boost;mor+=sfx.team_boost;}
+  }
+  const c=team.tacCard;
+  if(c){
+    // Legendary: golden generation maxes all stats
+    if(c.golden_gen){att=rand(92,97);def=rand(92,97);phy=rand(92,97);spc=rand(92,97);mor=rand(92,97);}
+    // Tactical revolution: take max(own, opp-1) per stat — handled at match level
+    if(!c.golden_gen){
+      const m=c.tier==="legendary"?2.0:c.tier==="rare"?1.7:1.5;
+      if(c.fx){att+=Math.round((c.fx.att||0)*m);def+=Math.round((c.fx.def||0)*m);phy+=Math.round((c.fx.phy||0)*m);spc+=Math.round((c.fx.spc||0)*m);mor+=Math.round((c.fx.mor||0)*m);}
+      if(isKO&&c.ko){att+=Math.round((c.ko.att||0)*m);def+=Math.round((c.ko.def||0)*m);mor+=Math.round((c.ko.mor||0)*m);}
+      if(c.late&&depth>=2){att+=Math.round((c.late.att||0)*m);phy+=Math.round((c.late.phy||0)*m);mor+=Math.round((c.late.mor||0)*m);}
+    }
+  }
+  return{att:clamp(att,30,99),def:clamp(def,30,99),phy:clamp(phy,30,99),spc:clamp(spc,30,99),mor:clamp(mor,30,99)};
+}
+function calcGoals(att,odef,phy,spc,omor){
+  // Expected goals: tighter, realistic range roughly 0.5–2.5
+  const netAtt=att-odef;
+  const physBonus=(phy-65)*0.05;
+  const spcBonus=(spc-65)*0.04;
+  const morPenalty=(omor-65)*0.03;
+  const lambda=clamp(1.15+netAtt/22+physBonus+spcBonus-morPenalty+(Math.random()-.5)*0.3,0.1,3.2);
+  // Poisson-approximated via sum of independent trials, capped at 6
+  let g=0;
+  const trials=8;
+  for(let i=0;i<trials;i++)if(Math.random()<lambda/trials)g++;
+  return Math.min(g,6);
+}
+function simMatch(t1,t2,allowDraw=true,isKO=false,depth=0){
+  // Tactical Revolution: for each stat take max(own, opp-1)
+  const applyTactRev=(myStats,oppStats)=>{
+    return{att:Math.max(myStats.att,oppStats.att-1),def:Math.max(myStats.def,oppStats.def-1),phy:Math.max(myStats.phy,oppStats.phy-1),spc:Math.max(myStats.spc,oppStats.spc-1),mor:Math.max(myStats.mor,oppStats.mor-1)};
+  };
+  let e1=getEff(t1,isKO,depth),e2=getEff(t2,isKO,depth);
+  if(t1.tacCard?.tact_revolution)e1=applyTactRev(e1,e2);
+  if(t2.tacCard?.tact_revolution)e2=applyTactRev(e2,e1);
+  let g1=calcGoals(e1.att,e2.def,e1.phy,e1.spc,e2.mor);
+  let g2=calcGoals(e2.att,e1.def,e2.phy,e2.spc,e1.mor);
+  // Legendary Wall: override opponent goals with weighted random
+  if(t1.tacCard?.legendary_wall){const r=Math.random();g2=r<0.80?0:r<0.95?1:2;effects.push("🟠 Legendary Iron Wall!");}
+  if(t2.tacCard?.legendary_wall){const r=Math.random();g1=r<0.80?0:r<0.95?1:2;effects.push("🟠 Legendary Iron Wall!");}
+  if(t1.tacCard?.underdog&&ovr(e1)<ovr(e2)){const u=t1.tacCard.underdog;g1=Math.max(g1,calcGoals(e1.att+u.att,e2.def-u.def,e1.phy,e1.spc,e2.mor));}
+  if(t2.tacCard?.underdog&&ovr(e2)<ovr(e1)){const u=t2.tacCard.underdog;g2=Math.max(g2,calcGoals(e2.att+u.att,e1.def-u.def,e2.phy,e2.spc,e1.mor));}
+  if(t1.tacCard?.clinical_att&&g1>=g2)g1=Math.max(g1,calcGoals(e1.att+t1.tacCard.clinical_att,e2.def,e1.phy,e1.spc,e2.mor));
+  if(t2.tacCard?.clinical_att&&g2>=g1)g2=Math.max(g2,calcGoals(e2.att+t2.tacCard.clinical_att,e1.def,e2.phy,e2.spc,e1.mor));
+  let effects=[];
+  const s1=t1.star,s2=t2.star;
+  const sfx1=getStarFx(s1),sfx2=getStarFx(s2);
+  // FWD: bonus goals based on tier (goal_chance>=1 means guaranteed goals)
+  if(s1?.pos==="FWD"&&sfx1){const gc=sfx1.goal_chance||0;if(gc>=1){g1+=Math.floor(gc);if(sfx1.goal_chance2&&Math.random()<sfx1.goal_chance2){g1++;effects.push("\u2B50 "+s1.name+" hat-trick run!");}else effects.push("\u2B50 "+s1.name+" scores!");}else if(Math.random()<gc){g1++;effects.push("\u2B50 "+s1.name+" scores!");}}
+  if(s2?.pos==="FWD"&&sfx2){const gc=sfx2.goal_chance||0;if(gc>=1){g2+=Math.floor(gc);if(sfx2.goal_chance2&&Math.random()<sfx2.goal_chance2){g2++;effects.push("\u2B50 "+s2.name+" hat-trick run!");}else effects.push("\u2B50 "+s2.name+" scores!");}else if(Math.random()<gc){g2++;effects.push("\u2B50 "+s2.name+" scores!");}}
+  // MID: chance-based goal
+  if(s1?.pos==="MID"&&sfx1?.goal_chance&&Math.random()<sfx1.goal_chance){g1++;effects.push("\u2B50 "+s1.name+" scores!");}
+  if(s2?.pos==="MID"&&sfx2?.goal_chance&&Math.random()<sfx2.goal_chance){g2++;effects.push("\u2B50 "+s2.name+" scores!");}
+  // GK: tier-based save + cap
+  if(s1?.pos==="GK"&&sfx1?.save_chance&&g2>0&&Math.random()<sfx1.save_chance){g2--;effects.push("\u2B50 "+s1.name+" incredible save!");}
+  if(s2?.pos==="GK"&&sfx2?.save_chance&&g1>0&&Math.random()<sfx2.save_chance){g1--;effects.push("\u2B50 "+s2.name+" incredible save!");}
+  if(s1?.pos==="GK"&&sfx1?.cap_ga!=null)g2=Math.min(g2,sfx1.cap_ga);
+  if(s2?.pos==="GK"&&sfx2?.cap_ga!=null)g1=Math.min(g1,sfx2.cap_ga);
+  // DEF: tier-based save + spc goal + cap
+  if(s1?.pos==="DEF"&&sfx1?.save_chance&&g2>0&&Math.random()<sfx1.save_chance){g2--;effects.push("\u2B50 "+s1.name+" clears off the line!");}
+  if(s2?.pos==="DEF"&&sfx2?.save_chance&&g1>0&&Math.random()<sfx2.save_chance){g1--;effects.push("\u2B50 "+s2.name+" clears off the line!");}
+  if(s1?.pos==="DEF"&&sfx1?.spc_goal&&Math.random()<sfx1.spc_goal){g1++;effects.push("\u2B50 "+s1.name+" heads in from a set piece!");}
+  if(s2?.pos==="DEF"&&sfx2?.spc_goal&&Math.random()<sfx2.spc_goal){g2++;effects.push("\u2B50 "+s2.name+" heads in from a set piece!");}
+  if(s1?.pos==="DEF"&&sfx1?.cap_ga!=null)g2=Math.min(g2,sfx1.cap_ga);
+  if(s2?.pos==="DEF"&&sfx2?.cap_ga!=null)g1=Math.min(g1,sfx2.cap_ga);
+  const c1=t1.tacCard,c2=t2.tacCard;
+  if(c1?.cancel_goal&&g2>0){g2--;effects.push("🃏 "+t1.name+" defend a goal away!");}
+  if(c2?.cancel_goal&&g1>0){g1--;effects.push("🃏 "+t2.name+" defend a goal away!");}
+  if(c1?.setpiece&&Math.random()<0.3){g1++;effects.push("🃏 "+t1.name+" score from a set piece!");}
+  if(c2?.setpiece&&Math.random()<0.3){g2++;effects.push("🃏 "+t2.name+" score from a set piece!");}
+  if(c1?.setpiece_rare&&Math.random()<0.7){g1++;effects.push("🟣 "+t1.name+" unstoppable set piece!");}
+  if(c2?.setpiece_rare&&Math.random()<0.7){g2++;effects.push("🟣 "+t2.name+" unstoppable set piece!");}
+  if(c1?.bonus_goal){g1++;effects.push("🟣 "+t1.name+" clinical finish!");}
+  if(c2?.bonus_goal){g2++;effects.push("🟣 "+t2.name+" clinical finish!");}
+  if(c1?.jogo_bonito){g1+=2;effects.push("🟠 Jogo Bonito! "+t1.name+" magnificent!");}
+  if(c2?.jogo_bonito){g2+=2;effects.push("🟠 Jogo Bonito! "+t2.name+" magnificent!");}
+  if(c1?.counter_bonus&&g1>g2){g1++;effects.push("🟣 "+t1.name+" lethal on the counter!");}
+  if(c2?.counter_bonus&&g2>g1){g2++;effects.push("🟣 "+t2.name+" lethal on the counter!");}
+  if(c1?.cap_ga!==undefined)g2=Math.min(g2,c1.cap_ga);
+  if(c2?.cap_ga!==undefined)g1=Math.min(g1,c2.cap_ga);
+  g1=Math.max(0,g1);g2=Math.max(0,g2);
+  const nd1=ALL_NATIONS.find(n=>n.name===t1.name)||{conf:"UEFA"};
+  const nd2=ALL_NATIONS.find(n=>n.name===t2.name)||{conf:"UEFA"};
+  const pool1=getPool(nd1.conf,t1.name),pool2=getPool(nd2.conf,t2.name);
+  const sc1=[],sc2=[];
+  const starGoalChance=(st,hasSpc)=>{if(!st)return 0;if(st.pos==="FWD")return 0.45;if(st.pos==="MID")return 0.18;if(st.pos==="DEF")return hasSpc?0.12:0.06;if(st.pos==="GK")return 0.02;return 0;};
+  for(let i=0;i<g1;i++){const chance=starGoalChance(s1,e1.spc>72);const n=(s1&&Math.random()<chance)?s1.name:pick(pool1);sc1.push(n);S.scorers[n]=(S.scorers[n]||0)+1;if(s1&&n===s1.name)s1.goals=(s1.goals||0)+1;}
+  for(let i=0;i<g2;i++){const chance=starGoalChance(s2,e2.spc>72);const n=(s2&&Math.random()<chance)?s2.name:pick(pool2);sc2.push(n);S.scorers[n]=(S.scorers[n]||0)+1;if(s2&&n===s2.name)s2.goals=(s2.goals||0)+1;}
+  if(s1?.pos==="GK")s1.goalsConceded=(s1.goalsConceded||0)+g2;
+  if(s2?.pos==="GK")s2.goalsConceded=(s2.goalsConceded||0)+g1;
+  S.teamGoals[t1.name]=(S.teamGoals[t1.name]||0)+g1;
+  S.teamGoals[t2.name]=(S.teamGoals[t2.name]||0)+g2;
+  S.teamGoalsConceded[t1.name]=(S.teamGoalsConceded[t1.name]||0)+g2;
+  S.teamGoalsConceded[t2.name]=(S.teamGoalsConceded[t2.name]||0)+g1;
+  const poss1=clamp(Math.round(45+(e1.att+e1.spc-e2.att-e2.spc)/4+(Math.random()-.5)*8),30,70);
+  const shots1=Math.max(1,Math.round(3+g1*2+rand(0,5)+(e1.att-60)/8));
+  const shots2=Math.max(1,Math.round(3+g2*2+rand(0,5)+(e2.att-60)/8));
+  const corners1=Math.max(0,Math.round(2+rand(0,6)+(e1.spc-60)/10));
+  const corners2=Math.max(0,Math.round(2+rand(0,6)+(e2.spc-60)/10));
+  S.teamShots[t1.name]=(S.teamShots[t1.name]||0)+shots1;
+  S.teamShots[t2.name]=(S.teamShots[t2.name]||0)+shots2;
+  S.teamPoss[t1.name]=(S.teamPoss[t1.name]||0)+poss1;
+  S.teamPoss[t2.name]=(S.teamPoss[t2.name]||0)+(100-poss1);
+  S.teamMatchCount[t1.name]=(S.teamMatchCount[t1.name]||0)+1;
+  S.teamMatchCount[t2.name]=(S.teamMatchCount[t2.name]||0)+1;
+  let winner=null,pens=null;
+  if(g1>g2)winner=t1;else if(g2>g1)winner=t2;
+  else if(!allowDraw){if(Math.random()<0.5){g1++;winner=t1;pens=t1.name+" win on penalties";}else{g2++;winner=t2;pens=t2.name+" win on penalties";}}
+  if(winner?.star)winner.star.wins=(winner.star.wins||0)+1;
+  [s1,s2].forEach((s,i)=>{
+    if(!s)return;const isW=winner===(i===0?t1:t2);const myG=i===0?g1:g2;const theirG=i===0?g2:g1;
+    let rat=6.0;
+    if(s.pos==="FWD")rat+=myG*0.9+(isW?0.3:0)+(myG>theirG?0.4:0);
+    else if(s.pos==="GK"||s.pos==="DEF")rat+=(theirG===0?1.5:theirG===1?0.6:0)+(isW?0.3:0);
+    else rat+=myG*0.5+(isW?0.5:0);
+    if(!s.ratings)s.ratings=[];s.ratings.push(clamp(rat,4,10));
+  });
+  S.allMatchResults.push({t1:t1.name,t2:t2.name,g1,g2,sc1,sc2,pens,phase:""});
+  const lateWin=Math.abs(g1-g2)===1&&Math.random()<0.3;
+  return{t1,t2,g1,g2,winner,pens,sc1,sc2,effects,poss1,poss2:100-poss1,shots1,shots2,corners1,corners2,e1,e2,lateWin,isKO};
+}
+function updateStats(res){
+  const{t1,t2,g1,g2}=res;
+  t1.gf+=g1;t1.ga+=g2;t2.gf+=g2;t2.ga+=g1;
+  const margin=Math.abs(g1-g2);
+  const lateBonus=res.lateWin?5:0;
+  const ovrGap=Math.abs(ovr(res.e1)-ovr(res.e2));
+  // Base morale delta from margin
+  const baseWinMor=margin===0?0:margin===1?4:margin===2?8:margin>=3?12:0;
+  const baseDrawMor=-3;
+  // Scale by OVR gap: beating a much stronger team = bigger boost; beating a much weaker team = smaller boost
+  const gapFactor=(gap,winnerIsStronger)=>{
+    if(gap<5)return 1.0;       // teams are similar, standard morale shift
+    if(gap<10)return winnerIsStronger?0.6:1.4; // moderate gap: underdog win = bigger boost
+    return winnerIsStronger?0.3:1.8;           // large gap: big upset = huge boost, expected win = small boost
+  };
+  let mor1Delta=0,mor2Delta=0;
+  if(g1>g2){
+    t1.w++;t1.pts+=3;t2.l++;
+    const t1Stronger=ovr(res.e1)>=ovr(res.e2);
+    const winFactor=gapFactor(ovrGap,t1Stronger);
+    mor1Delta=Math.round((baseWinMor+lateBonus)*winFactor);
+    mor2Delta=-Math.round(baseWinMor*(t1Stronger?0.7:1.3));
+    if(t1.tacCard?.momentum)t1._morStreak=(t1._morStreak||0)+1;else t1._morStreak=0;
+    t2._morStreak=0;
+  }else if(g2>g1){
+    t2.w++;t2.pts+=3;t1.l++;
+    const t2Stronger=ovr(res.e2)>=ovr(res.e1);
+    const winFactor=gapFactor(ovrGap,t2Stronger);
+    mor2Delta=Math.round((baseWinMor+lateBonus)*winFactor);
+    mor1Delta=-Math.round(baseWinMor*(t2Stronger?0.7:1.3));
+    if(t2.tacCard?.momentum)t2._morStreak=(t2._morStreak||0)+1;else t2._morStreak=0;
+    t1._morStreak=0;
+  }else{
+    t1.d++;t1.pts++;t2.d++;t2.pts++;
+    mor1Delta=baseDrawMor;mor2Delta=baseDrawMor;
+    t1._morStreak=0;t2._morStreak=0;
+  }
+  t1.mor=clamp((t1.mor||50)+mor1Delta,30,99);
+  t2.mor=clamp((t2.mor||50)+mor2Delta,30,99);
+  // Momentum card stacking
+  if(t1.tacCard?.momentum)t1.mor=clamp(t1.mor+Math.min((t1._morStreak||0)*2,10),30,99);
+  if(t2.tacCard?.momentum)t2.mor=clamp(t2.mor+Math.min((t2._morStreak||0)*2,10),30,99);
+  // Store deltas on res so popup can display them
+  res.mor1Delta=mor1Delta;res.mor2Delta=mor2Delta;
+  res.mor1After=t1.mor;res.mor2After=t2.mor;
+}
+
+// GROUPS
+function standingsOf(grp){return[...grp.teams].sort((a,b)=>{if(b.pts!==a.pts)return b.pts-a.pts;if((b.gf-b.ga)!==(a.gf-a.ga))return(b.gf-b.ga)-(a.gf-a.ga);return b.gf-a.gf;});}
+function buildGroups(){
+  // Region-balanced draw: max 2 UEFA, max 1 CONMEBOL, max 1 CAF, max 1 AFC, max 1 CONCACAF, max 1 OFC per group
+  const byConf={};
+  S.teams.forEach(t=>{const conf=ALL_NATIONS.find(n=>n.name===t.name)?.conf||"UEFA";if(!byConf[conf])byConf[conf]=[];byConf[conf].push(t);});
+  Object.keys(byConf).forEach(c=>shuffle(byConf[c]));
+  S.groups=Array.from({length:12},(_,i)=>({name:String.fromCharCode(65+i),teams:[]}));
+  const confLimits={UEFA:2,CONMEBOL:1,CAF:1,AFC:1,CONCACAF:1,OFC:1};
+  const groupConfCount=Array.from({length:12},()=>({}));
+  // First pass: assign each team respecting limits
+  const allTeams=shuffle([...S.teams]);
+  const unplaced=[];
+  allTeams.forEach(t=>{
+    const conf=ALL_NATIONS.find(n=>n.name===t.name)?.conf||"UEFA";
+    const limit=confLimits[conf]||1;
+    // Find a group with room that hasn't hit conf limit
+    const candidates=S.groups.map((g,i)=>i).filter(i=>S.groups[i].teams.length<4&&(groupConfCount[i][conf]||0)<limit);
+    if(candidates.length){
+      const gi=pick(candidates);
+      S.groups[gi].teams.push(t);
+      groupConfCount[gi][conf]=(groupConfCount[gi][conf]||0)+1;
+    } else {
+      unplaced.push(t);
+    }
+  });
+  // Second pass: place any unplaced teams in groups that have room (ignore conf limits)
+  unplaced.forEach(t=>{
+    const g=S.groups.find(g=>g.teams.length<4);
+    if(g)g.teams.push(t);
+  });
+}
+function buildGroupMatches(){S.groupMatches=[];S.groups.forEach((grp,gi)=>{const t=grp.teams;[[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]].forEach(([a,b])=>S.groupMatches.push({gi,t1:t[a],t2:t[b],played:false,result:null}));});}
+function relinkTeams(){
+  if(!S.groups.length&&!S.teams.length)return;
+  // Build lookup maps
+  const teamByName={};
+  S.groups.forEach(grp=>grp.teams.forEach(t=>teamByName[t.name]=t));
+  S.teams.forEach(t=>{if(!teamByName[t.name])teamByName[t.name]=t;});
+
+  // Re-link team.star to the live S.activeStars object (same id)
+  // so goal/rating mutations during matches update the leaderboard
+  const starById={};
+  S.activeStars.forEach(s=>starById[s.id]=s);
+  const starByName={};
+  S.activeStars.forEach(s=>starByName[s.name]=s);
+
+  const relinkTeamObj=(t)=>{
+    if(!t)return;
+    if(t.star){
+      const live=starById[t.star.id]||starByName[t.star.name];
+      if(live)t.star=live;
+    }
+    // tacCards are value objects, no relinking needed
+  };
+
+  // Relink all team objects
+  Object.values(teamByName).forEach(relinkTeamObj);
+
+  // Relink group match team references
+  S.groupMatches.forEach(m=>{
+    if(m.t1?.name&&teamByName[m.t1.name])m.t1=teamByName[m.t1.name];
+    if(m.t2?.name&&teamByName[m.t2.name])m.t2=teamByName[m.t2.name];
+    if(m.result){
+      if(m.result.t1?.name&&teamByName[m.result.t1.name])m.result.t1=teamByName[m.result.t1.name];
+      if(m.result.t2?.name&&teamByName[m.result.t2.name])m.result.t2=teamByName[m.result.t2.name];
+      if(m.result.winner?.name&&teamByName[m.result.winner.name])m.result.winner=teamByName[m.result.winner.name];
+    }
+  });
+  // Relink knockout round team references
+  S.knockoutRounds.forEach(round=>round.matches.forEach(m=>{
+    if(m.t1?.name&&teamByName[m.t1.name])m.t1=teamByName[m.t1.name];
+    if(m.t2?.name&&teamByName[m.t2.name])m.t2=teamByName[m.t2.name];
+    if(m.result){
+      if(m.result.t1?.name&&teamByName[m.result.t1.name])m.result.t1=teamByName[m.result.t1.name];
+      if(m.result.t2?.name&&teamByName[m.result.t2.name])m.result.t2=teamByName[m.result.t2.name];
+      if(m.result.winner?.name&&teamByName[m.result.winner.name])m.result.winner=teamByName[m.result.winner.name];
+    }
+  }));
+}
+function getKOQualifiers(){const fs=[],thirds=[];S.groups.forEach(grp=>{const s=standingsOf(grp);fs.push(s[0],s[1]);thirds.push(s[2]);if(!S.roundReached[s[3].name])S.roundReached[s[3].name]="Group";});const sorted=thirds.sort((a,b)=>{if(b.pts!==a.pts)return b.pts-a.pts;if((b.gf-b.ga)!==(a.gf-a.ga))return(b.gf-b.ga)-(a.gf-a.ga);if(b.gf!==a.gf)return b.gf-a.gf;return Math.random()-.5;});sorted.slice(0,8).forEach(t=>{if(!S.roundReached[t.name])S.roundReached[t.name]="Round of 32";});sorted.slice(8).forEach(t=>{if(!S.roundReached[t.name])S.roundReached[t.name]="Group";});return shuffle([...fs,...sorted.slice(0,8)]);}
+
+// PLAY
+function startKnockout(){S.phase="knockout";S.groups.forEach(grp=>standingsOf(grp).slice(2).forEach(t=>{if(!S.roundReached[t.name])S.roundReached[t.name]="Group";}));const q=getKOQualifiers();const matches=[];for(let i=0;i<q.length;i+=2)matches.push({t1:q[i],t2:q[i+1],played:false,result:null});S.knockoutRounds=[{name:"Round of 32",matches}];setPhase("knockout","Round of 32 — "+matches.length+" matches");renderGroups();renderBracket();showUpcoming();toast("Group stage done! Round of 32 begins.");}
+function advanceKnockout(){
+  const round=S.knockoutRounds[S.knockoutRounds.length-1];
+  const winners=round.matches.map(m=>m.result?.winner).filter(Boolean);
+  const losers=round.matches.map(m=>{const r=m.result;if(!r?.winner)return null;return r.winner===m.t1?m.t2:m.t1;}).filter(Boolean);
+  const nm={32:"Round of 32",16:"Round of 16",8:"Quarter-finals",4:"Semi-finals",2:"Final"};
+  const nextName=nm[winners.length]||"Round";
+
+  // After 3rd place match: record 3rd/4th, then push the Final
+  if(round.name==="3rd Place"){
+    const third=winners[0];
+    const fourth=losers[0];
+    if(third&&!S.roundReached[third.name])S.roundReached[third.name]="3rd Place";
+    if(fourth&&!S.roundReached[fourth.name])S.roundReached[fourth.name]="4th Place";
+    const semiRound=S.knockoutRounds.find(r=>r.name==="Semi-finals");
+    const finalists=semiRound.matches.map(m=>m.result?.winner).filter(Boolean);
+    const finalMatches=[{t1:finalists[0],t2:finalists[1],played:false,result:null}];
+    S.knockoutRounds.push({name:"Final",matches:finalMatches});
+    setPhase("knockout","The Final!");
+    renderBracket();showUpcoming();toast("The Final is here!");
+    return;
+  }
+
+  // After Final: crown champion
+  if(round.name==="Final"){
+    S.phase="done";S.champion=winners[0];
+    S.roundReached[winners[0].name]="Winner";
+    if(losers[0])S.roundReached[losers[0].name]="Final";
+    setPhase("done","🏆 "+winners[0].name+" ARE CHAMPIONS!");
+    finalizeTournament();return;
+  }
+
+  // After semi-finals: record semi losers then push 3rd place match
+  if(round.name==="Semi-finals"){
+    losers.forEach(t=>{if(!S.roundReached[t.name])S.roundReached[t.name]="Semi-finals";});
+    const thirdMatch={t1:losers[0],t2:losers[1],played:false,result:null,isThirdPlace:true};
+    S.knockoutRounds.push({name:"3rd Place",matches:[thirdMatch]});
+    setPhase("knockout","3rd Place match — then the Final!");
+    renderBracket();showUpcoming();toast("3rd Place match — play it before the Final!");
+    return;
+  }
+
+  // All other rounds: record losers and advance winners
+  losers.forEach(t=>{if(!S.roundReached[t.name])S.roundReached[t.name]=nextName;});
+  const matches=[];for(let i=0;i<winners.length;i+=2)matches.push({t1:winners[i],t2:winners[i+1],played:false,result:null});
+  S.knockoutRounds.push({name:nextName,matches});
+  setPhase("knockout",nextName+" — "+matches.length+" matches");
+  renderBracket();showUpcoming();toast(nextName+" begins!");
+}
+let pendingMatch=null,pendingMatchPhase="",pendingMatchCb=null;
+function playNext(){
+  if(S.phase==="groups"){
+    const pending=S.groupMatches.filter(m=>!m.played);if(!pending.length){startKnockout();return;}
+    const m=pending[0];
+    const round="Group "+S.groups[m.gi].name;
+    showPreview(m.t1,m.t2,round,()=>{
+      const res=simMatch(m.t1,m.t2,true,false,0);m.played=true;m.result=res;updateStats(res);
+      S.allMatchResults[S.allMatchResults.length-1].phase=round;
+      autoSave();
+      showPopup(res,round,()=>{renderGroups();renderResults();const rem=S.groupMatches.filter(x=>!x.played).length;setPhase("groups",rem+" group matches remaining");if(!rem)setTimeout(startKnockout,200);else showUpcoming();});
+    });
+  } else if(S.phase==="knockout"){
+    const round=S.knockoutRounds[S.knockoutRounds.length-1];const pending=round.matches.filter(m=>!m.played);if(!pending.length){advanceKnockout();return;}
+    const m=pending[0];const depth=S.knockoutRounds.length;
+    showPreview(m.t1,m.t2,round.name,()=>{
+      const res=simMatch(m.t1,m.t2,false,true,depth);m.played=true;m.result=res;updateStats(res);
+      S.allMatchResults[S.allMatchResults.length-1].phase=round.name;
+      autoSave();
+      showPopup(res,round.name,()=>{renderBracket();renderResults();const rem=round.matches.filter(x=>!x.played).length;setPhase("knockout",round.name+" — "+rem+" left");showUpcoming();});
+    });
+  }
+}
+function showPreview(t1,t2,round,cb){
+  pendingMatchCb=cb;
+  document.getElementById("pu-preview").style.display="block";
+  document.getElementById("pu-result").style.display="none";
+  document.getElementById("pu-pre-round").textContent=round.toUpperCase();
+  const e1=getEff(t1),e2=getEff(t2);
+
+  // Get group record for a team
+  const getRecord=(t)=>{
+    const gStats=S.groupMatches.filter(m=>m.played&&(m.t1.name===t.name||m.t2.name===t.name));
+    let w=0,d=0,l=0,gf=0,ga=0,pts=0;
+    gStats.forEach(m=>{
+      const mine=m.t1.name===t.name?m.result?.g1:m.result?.g2;
+      const theirs=m.t1.name===t.name?m.result?.g2:m.result?.g1;
+      if(mine==null)return;gf+=mine;ga+=theirs;
+      if(mine>theirs){w++;pts+=3;}else if(mine===theirs){d++;pts+=1;}else l++;
+    });
+    return{w,d,l,gf,ga,pts,played:gStats.length};
+  };
+
+  const statBar=(label,v1,v2)=>{
+    const max=Math.max(v1,v2,1);
+    const pct1=Math.round(v1/max*100);const pct2=Math.round(v2/max*100);
+    const hi1=v1>=v2?"font-weight:600;color:var(--acc)":"color:var(--txt2)";
+    const hi2=v2>=v1?"font-weight:600;color:var(--acc)":"color:var(--txt2)";
+    return`<div style="${hi1};text-align:right">${v1}</div><div style="font-size:10px;color:var(--txt3);text-align:center">${label}</div><div style="${hi2}">${v2}</div>`;
+  };
+
+  const teamBlock=(t,e,rec,align)=>{
+    const starLine=t.star?`<div style="font-size:10px;color:var(--acc);margin-top:3px">⭐ ${t.star.name} (${t.star.pos})</div>`:"";
+    const cardLine=t.tacCard?`<div style="font-size:10px;color:var(--blue);margin-top:2px">🃏 ${t.tacCard.name}</div>`:"";
+    const recLine=rec.played?`<div style="font-size:11px;color:var(--txt3);margin-top:3px">${rec.w}W ${rec.d}D ${rec.l}L · ${rec.gf}:${rec.ga} · ${rec.pts}pts</div>`:`<div style="font-size:11px;color:var(--txt3);margin-top:3px">No games yet</div>`;
+    return`<div style="text-align:${align}">
+      <div style="display:flex;align-items:center;gap:6px;justify-content:${align==="left"?"flex-start":"flex-end"}">
+        ${align==="left"?fi(t.cc):""}
+        <div style="font-weight:600;font-size:14px">${t.name}${t.isHost?" 🏠":""}</div>
+        ${align==="right"?fi(t.cc):""}
+      </div>
+      ${starLine}${cardLine}${recLine}
+    </div>`;
+  };
+
+  const r1=getRecord(t1),r2=getRecord(t2);
+  document.getElementById("pu-pre-t1").innerHTML=teamBlock(t1,e1,r1,"left");
+  document.getElementById("pu-pre-t2").innerHTML=teamBlock(t2,e2,r2,"right");
+  document.getElementById("pu-pre-records").innerHTML=`
+    ${statBar("OVR",ovr(e1),ovr(e2))}
+    ${statBar("ATT",e1.att,e2.att)}
+    ${statBar("DEF",e1.def,e2.def)}
+    ${statBar("PHY",e1.phy,e2.phy)}
+    ${statBar("SPC",e1.spc,e2.spc)}
+    ${statBar("MOR",e1.mor,e2.mor)}
+  `;
+  document.getElementById("popup-overlay").classList.remove("hidden");
+}
+function playConfirmed(){
+  document.getElementById("pu-preview").style.display="none";
+  document.getElementById("pu-result").style.display="block";
+  if(pendingMatchCb){pendingMatchCb();pendingMatchCb=null;}
+}
+
+// FINALIZE
+function finalizeTournament(){
+  const ptm={"Winner":5,"Final":3,"Semi-finals":2,"Quarter-finals":1,"Round of 16":0.5,"Round of 32":0,"Group":-1};
+  ALL_NATIONS.forEach(n=>{const m=teamMeta[n.name];if(!m)return;const reached=S.roundReached[n.name]||"Group";if(reached==="Winner"){m.titles=(m.titles||0)+1;m.finals=(m.finals||0)+1;m.semis=(m.semis||0)+1;m.quarters=(m.quarters||0)+1;}else if(reached==="Final"){m.finals=(m.finals||0)+1;m.semis=(m.semis||0)+1;m.quarters=(m.quarters||0)+1;}else if(reached==="Semi-finals"){m.semis=(m.semis||0)+1;m.quarters=(m.quarters||0)+1;}else if(reached==="Quarter-finals")m.quarters=(m.quarters||0)+1;else if(reached==="Group")m.groupExits=(m.groupExits||0)+1;const rt=S.teams.find(x=>x.name===n.name);m.prevRating=rt?ovr(rt):m.prevRating;recalcNextRating(n.name);});
+  const topScorers=Object.entries(S.scorers).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const topTeam=Object.entries(S.teamGoals).sort((a,b)=>b[1]-a[1])[0];
+  const totalGoals=Object.values(S.scorers).reduce((a,b)=>a+b,0);
+  const totalMatches=S.groupMatches.length+S.knockoutRounds.reduce((s,r)=>s+r.matches.length,0);
+  let bestPlayer=null,bestPlayerR=0,bestDef=null,bestDefR=0,topStarScorer=null,topStarG=0;
+  S.activeStars.forEach(st=>{const avgR=st.ratings?.length?st.ratings.reduce((a,b)=>a+b,0)/st.ratings.length:0;if(avgR>bestPlayerR){bestPlayerR=avgR;bestPlayer=st;}if((st.pos==="GK"||st.pos==="DEF")&&avgR>bestDefR){bestDefR=avgR;bestDef=st;}if((st.goals||0)>topStarG){topStarG=st.goals||0;topStarScorer=st;}if(!st.allTimeRatings)st.allTimeRatings=[];st.allTimeRatings.push({wc:S.wcNumber,rating:+avgR.toFixed(2),goals:st.goals||0});st.wcsPlayed=(S.wcNumber-st.wcStart+1);});
+  // Find runner-up, 3rd, 4th from rounds — MUST be before medal tracking
+  const finalRound=S.knockoutRounds.find(r=>r.name==="Final");
+  const thirdRound=S.knockoutRounds.find(r=>r.name==="3rd Place");
+  const runnerUp=finalRound?.matches[0]?.result?(finalRound.matches[0].result.winner===finalRound.matches[0].t1?finalRound.matches[0].t2:finalRound.matches[0].t1):null;
+  const thirdPlace=thirdRound?.matches[0]?.result?.winner||null;
+  const fourthPlace=thirdRound?.matches[0]?.result?(thirdRound.matches[0].result.winner===thirdRound.matches[0].t1?thirdRound.matches[0].t2:thirdRound.matches[0].t1):null;
+  // Medal tracking: which stars are on 1st/2nd/3rd place teams
+  // Store only the delta for THIS WC (0 or 1) so renderHistory can sum correctly
+  const thirdN=thirdPlace?.name,runnerUpN=runnerUp?.name,champN=S.champion.name;
+  S.activeStars.forEach(st=>{
+    if(!st.medals)st.medals={gold:0,silver:0,bronze:0};
+    if(st.teamName===champN)st.medals.gold++;
+    else if(st.teamName===runnerUpN)st.medals.silver++;
+    else if(st.teamName===thirdN)st.medals.bronze++;
+  });
+  const starSnap=S.activeStars.map(st=>{
+    // Save per-WC medal delta (1 or 0 for each) not cumulative
+    const medDelta={
+      gold:st.teamName===champN?1:0,
+      silver:st.teamName===runnerUpN?1:0,
+      bronze:st.teamName===thirdN?1:0
+    };
+    return{name:st.name,team:st.teamName,pos:st.pos,tier:st.tier||"common",goals:st.goals||0,wins:st.wins||0,gc:st.goalsConceded||0,wcsPlayed:st.wcsPlayed||1,wcRating:st.ratings?.length?+(st.ratings.reduce((a,b)=>a+b,0)/st.ratings.length).toFixed(2):0,allTimeRatings:st.allTimeRatings||[],medals:medDelta};
+  });
+  // Team wins per tournament
+  const teamWinsMap={};
+  S.allMatchResults.forEach(m=>{
+    if(m.g1>m.g2)teamWinsMap[m.t1]=(teamWinsMap[m.t1]||0)+1;
+    else if(m.g2>m.g1)teamWinsMap[m.t2]=(teamWinsMap[m.t2]||0)+1;
+  });
+  const topTeamWins=Object.entries(teamWinsMap).sort((a,b)=>b[1]-a[1])[0];
+  const topGoalsTeam=Object.entries(S.teamGoals).sort((a,b)=>b[1]-a[1])[0];
+  // Fix roundReached for runner-up
+  if(runnerUp&&!S.roundReached[runnerUp.name])S.roundReached[runnerUp.name]="Final";
+  if(thirdPlace&&!S.roundReached[thirdPlace.name])S.roundReached[thirdPlace.name]="3rd Place";
+  if(fourthPlace&&!S.roundReached[fourthPlace.name])S.roundReached[fourthPlace.name]="4th Place";
+  const entry={edition:S.wcNumber,champion:S.champion.name,cc:S.champion.cc,
+    runnerUp:runnerUp?{name:runnerUp.name,cc:runnerUp.cc}:null,
+    thirdPlace:thirdPlace?{name:thirdPlace.name,cc:thirdPlace.cc}:null,
+    fourthPlace:fourthPlace?{name:fourthPlace.name,cc:fourthPlace.cc}:null,
+    host:S.hostNation,topScorers,totalGoals,totalMatches,
+    topScoringTeam:topGoalsTeam?{name:topGoalsTeam[0],goals:topGoalsTeam[1]}:null,
+    topWinsTeam:topTeamWins?{name:topTeamWins[0],wins:topTeamWins[1]}:null,
+    mvp:bestPlayer?{name:bestPlayer.name,pos:bestPlayer.pos,team:bestPlayer.teamName,rating:+bestPlayerR.toFixed(2)}:null,
+    topScorerAward:topStarScorer?{name:topStarScorer.name,goals:topStarG,team:topStarScorer.teamName}:null,
+    defMvp:bestDef?{name:bestDef.name,pos:bestDef.pos,team:bestDef.teamName,rating:+bestDefR.toFixed(2)}:null,
+    // legacy compat
+    bestPlayer:bestPlayer?{name:bestPlayer.name,pos:bestPlayer.pos,team:bestPlayer.teamName,rating:+bestPlayerR.toFixed(2)}:null,
+    bestDefender:bestDef?{name:bestDef.name,pos:bestDef.pos,team:bestDef.teamName,rating:+bestDefR.toFixed(2)}:null,
+    topScorerStar:topStarScorer?{name:topStarScorer.name,goals:topStarG,team:topStarScorer.teamName}:null,
+    stars:starSnap,cards:S.tacCards.map(tc=>({card:tc.card.name,team:tc.teamName})),roundReached:{...S.roundReached}};
+  allHistory.unshift(entry);S.wcNumber++;
+  S.activeStars.forEach(st=>{st.goals=0;st.wins=0;st.goalsConceded=0;st.ratings=[];});
+  saveLS();
+  document.getElementById("btn-play").disabled=true;
+  document.getElementById("btn-newwc").disabled=false;
+  showChampionBanner();renderHistory();renderResults();
+}
+function saveAndClose(){saveLS();renderHistory();setTimeout(()=>switchTab('history'),300);toast("Saved!");}
+function showChampionBanner(){
+  const c=S.champion;const tg=Object.values(S.scorers).reduce((a,b)=>a+b,0);
+  const tm=S.groupMatches.length+S.knockoutRounds.reduce((s,r)=>s+r.matches.length,0);
+  // Compute player awards
+  let mvp=null,mvpR=0,topScorer=null,topG=0,defMvp=null,defR=0;
+  S.activeStars.forEach(st=>{
+    const avgR=st.ratings?.length?st.ratings.reduce((a,b)=>a+b,0)/st.ratings.length:0;
+    if(avgR>mvpR){mvpR=avgR;mvp=st;}
+    if((st.goals||0)>topG){topG=st.goals||0;topScorer=st;}
+    if((st.pos==="GK"||st.pos==="DEF")&&avgR>defR){defR=avgR;defMvp=st;}
+  });
+  const awardRow=(icon,title,star,val)=>star?`<div class="award-row"><span class="award-icon">${icon}</span><div class="award-body"><div class="award-title">${title}</div><div class="award-name">${star.name}</div><div class="award-meta">${star.pos} · ${star.teamName} · ${val}</div></div></div>`:"";
+  const awardsHtml=`<div class="awards-block">${awardRow("🏆","MVP — Best Player",mvp,mvpR.toFixed(1)+" avg")}${awardRow("⚽","Top Scorer",topScorer,topG+" goals")}${awardRow("🛡️","Defensive MVP",defMvp,defR.toFixed(1)+" avg")}</div>`;
+  document.getElementById("play-area").innerHTML=`<div class="champ-banner"><div style="font-size:42px;margin-bottom:8px">🏆</div><div class="champ-title">WORLD CHAMPIONS</div><div class="champ-team">${fi(c.cc)} ${c.name}</div>${S.hostNation?`<div style="font-size:12px;color:var(--txt3);margin-top:6px">🏠 Hosted by ${S.hostNation}</div>`:""}<div style="font-size:12px;color:var(--txt2);margin-top:6px">${tg} goals · ${tm} matches</div>${awardsHtml}<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn btn-grn" onclick="saveAndClose()">💾 SAVE &amp; VIEW HISTORY</button><button class="btn btn-acc" onclick="startNewWC()">START NEXT WORLD CUP →</button></div></div>`;
+}
+
+// POPUP
+function buildLiveTicker(res,e1,e2){
+  // Distribute goals across 4 periods: 25', 45', 65', 90'
+  // PHY affects late-game goals; cards like Park the Bus suppress early goals
+  const g1=res.g1,g2=res.g2;
+  const hasParkBus1=res.t1.tacCard?.id==="parkbus",hasParkBus2=res.t2.tacCard?.id==="parkbus";
+  // Weights per period [0-25, 26-45, 46-65, 66-90] — biased by PHY and cards
+  const periodWeights=(e,hasPark)=>{
+    const phyAdj=(e.phy-65)/200; // high PHY = stronger finish
+    const base=hasPark?[0.08,0.17,0.30,0.45]:[0.18,0.27,0.28,0.27];
+    return base.map((w,i)=>Math.max(0.02,w+(i>=2?phyAdj:-phyAdj)));
+  };
+  const distGoals=(total,weights)=>{
+    const periods=[0,0,0,0];
+    for(let i=0;i<total;i++){
+      const sum=weights.reduce((a,b)=>a+b,0);let r=Math.random()*sum;
+      for(let p=0;p<4;p++){r-=weights[p];if(r<=0){periods[p]++;break;}}
+    }
+    return periods;
+  };
+  const w1=periodWeights(e1,hasParkBus1),w2=periodWeights(e2,hasParkBus2);
+  const p1=distGoals(g1,w1),p2=distGoals(g2,w2);
+  const labels=["25'","HT 45'","65'","FT 90'"];
+  let s1=0,s2=0;
+  return labels.map((lbl,i)=>{
+    s1+=p1[i];s2+=p2[i];
+    const delta1=p1[i],delta2=p2[i];
+    const goalStr=(d,side)=>d>0?`<span style="color:var(--acc);font-size:10px">${side==="l"?"⚽".repeat(d)+"":"⚽".repeat(d)}</span>`:"";
+    return`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;margin:3px 0">
+      <div style="text-align:right;font-size:10px">${goalStr(delta1,"l")}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:${i===1||i===3?"var(--acc)":"var(--txt2)"};text-align:center;min-width:70px">${s1} — ${s2} <span style="font-size:9px;color:var(--txt3)">${lbl}</span></div>
+      <div style="text-align:left;font-size:10px">${goalStr(delta2,"r")}</div>
+    </div>`;
+  }).join("");
+}
+function showPopup(res,round,cb){
+  popupCb=cb;
+  document.getElementById("pu-preview").style.display="none";
+  document.getElementById("pu-result").style.display="block";
+  // Live ticker only for KO matches
+  const ticker=document.getElementById("pu-live-ticker");
+  if(res.isKO){ticker.style.display="block";ticker.innerHTML=buildLiveTicker(res,res.e1,res.e2);}
+  else{ticker.style.display="none";}
+  document.getElementById("pu-winner").textContent=res.winner?res.winner.name+"  WINS!":"DRAW";
+  document.getElementById("pu-score").textContent=res.g1+" — "+res.g2;
+  document.getElementById("pu-t1n").textContent=res.t1.name;
+  document.getElementById("pu-t2n").textContent=res.t2.name;
+  document.getElementById("pu-round").textContent=round;
+  document.getElementById("pu-pens").textContent=res.pens||"";
+  document.getElementById("pu-fx").textContent=res.effects.join(" · ");
+  // In popup, show star scorers only (⭐ tagged), non-star goals just shown as count
+  const starNames=new Set(S.activeStars.map(s=>s.name));
+  const sc1Stars=res.sc1.filter(n=>starNames.has(n));
+  const sc2Stars=res.sc2.filter(n=>starNames.has(n));
+  const sc1NonStar=res.g1-sc1Stars.length;
+  const sc2NonStar=res.g2-sc2Stars.length;
+  const fmtScLine=(stars,nonStar)=>{const p=[...stars.map(n=>"\u2605 "+n)];if(nonStar>0)p.push(nonStar+(nonStar===1?" goal":" goals"));return p.join(", ")||"\u2014";};
+  const scLine1=fmtScLine(sc1Stars,sc1NonStar);const scLine2=fmtScLine(sc2Stars,sc2NonStar);
+  const showSc=res.g1>0||res.g2>0;
+  const morFmt=(d,after)=>{if(d===0)return`<span style="color:var(--txt3)">— (${after})</span>`;const col=d>0?"var(--grn)":"#e05050";const sign=d>0?"+":"";return`<span style="color:${col};font-weight:600">${sign}${d} MOR</span> <span style="color:var(--txt3)">(→${after})</span>`;};
+  document.getElementById("pu-stats").innerHTML=`<div class="psv l">${res.poss1}%</div><div class="psl">Possession</div><div class="psv r">${res.poss2}%</div><div class="popup-bar-wrap"><div class="popup-bar-l" style="width:${res.poss1}%"></div><div class="popup-bar-r"></div></div><div class="psv l">${res.shots1}</div><div class="psl">Shots</div><div class="psv r">${res.shots2}</div><div class="psv l">${res.corners1}</div><div class="psl">Corners</div><div class="psv r">${res.corners2}</div>${showSc?`<div class="psv l" style="font-size:11px;font-family:'DM Sans';color:var(--txt2);font-weight:400;text-align:right">${scLine1}</div><div class="psl">Goals</div><div class="psv r" style="font-size:11px;font-family:'DM Sans';color:var(--txt2);font-weight:400">${scLine2}</div>`:""}<div class="psv l" style="font-size:13px">${ovr(res.e1)}</div><div class="psl">OVR</div><div class="psv r" style="font-size:13px">${ovr(res.e2)}</div>${res.mor1Delta!=null?`<div class="psv l" style="font-size:11px;text-align:right">${morFmt(res.mor1Delta,res.mor1After)}</div><div class="psl">Morale</div><div class="psv r" style="font-size:11px">${morFmt(res.mor2Delta,res.mor2After)}</div>`:""}`;
+  document.getElementById("popup-overlay").classList.remove("hidden");
+}
+function closePopup(){document.getElementById("popup-overlay").classList.add("hidden");if(popupCb){popupCb();popupCb=null;}}
+
+// MODAL
+function startNewWC(){
+  document.getElementById("btn-newwc").disabled=true;
+  S.allMatchResults=[];S.teamGoals={};S.scorers={};S.teamGoalsConceded={};S.teamShots={};S.teamPoss={};S.teamMatchCount={};
+  // Retire stars
+  const retired=[];
+  S.activeStars=S.activeStars.filter(st=>{
+    if(st.wcStart+st.lifespan<=S.wcNumber){retired.push(st);return false;}return true;
+  });
+  // New stars to fill up to 8 — each nation can only have ONE star or card total
+  const needed=Math.max(0,10-S.activeStars.length);pendingNewStars=[];
+  const usedNations=new Set(S.activeStars.map(s=>s.teamName));
+  const posPick=()=>{const r=Math.random();return r<0.40?"MID":r<0.70?"FWD":r<0.85?"GK":"DEF";};
+  const starTierPick=(idx,total)=>{
+    // First 1-2 slots: legendary (25% chance each), next 1-2: rare (40%), rest: common
+    if(idx===0&&Math.random()<0.3)return"legendary";
+    if(idx<=1&&Math.random()<0.3)return"legendary";
+    if(idx<=2&&Math.random()<0.45)return"rare";
+    if(idx<=3&&Math.random()<0.35)return"rare";
+    return"common";
+  };
+  const STAR_TIER_FX={
+    legendary:{lifespan_bonus:2,desc:"Legendary star — game-changing presence"},
+    rare:{lifespan_bonus:1,desc:"Rare star — exceptional talent"},
+    common:{lifespan_bonus:0,desc:"Star player"}
+  };
+  for(let i=0;i<needed;i++){
+    const pool=ALL_NATIONS.filter(n=>!usedNations.has(n.name));
+    if(!pool.length)break;
+    const n=weightedPickNation(pool);
+    usedNations.add(n.name);
+    const autoName=getStarName(n.name);
+    const tier=starTierPick(i,needed);
+    const lifespanBase=rand(3,6);
+    const lifespan=lifespanBase+(STAR_TIER_FX[tier]?.lifespan_bonus||0);
+    pendingNewStars.push({id:Date.now()+i+Math.random(),teamName:n.name,cc:n.cc,pos:posPick(),tier,name:autoName,lifespan,wcStart:S.wcNumber,wcsPlayed:0,wins:0,goals:0,goalsConceded:0,ratings:[],allTimeRatings:[]});
+  }
+  // 5 new tactical cards — also excluded from any nation that has a star
+  const starTeamNames=new Set([...S.activeStars.map(s=>s.teamName),...pendingNewStars.map(s=>s.teamName)]);
+  const eligible=ALL_NATIONS.filter(n=>!starTeamNames.has(n.name));
+  const commons=shuffle(TAC_CARDS.filter(c=>c.tier==="common"));
+  const rares=shuffle(TAC_CARDS.filter(c=>c.tier==="rare"));
+  const legendaries=shuffle(TAC_CARDS.filter(c=>c.tier==="legendary"));
+  const fifth=Math.random()<0.5&&legendaries.length?legendaries[0]:commons[3]||commons[0];
+  const chosenCards=[rares[0],commons[0],commons[1],commons[2],fifth].filter(Boolean);
+  const cardNations=[];const eligibleCopy=[...eligible];
+  for(let i=0;i<chosenCards.length&&eligibleCopy.length;i++){const chosen=weightedPickNation(eligibleCopy);cardNations.push(chosen);eligibleCopy.splice(eligibleCopy.indexOf(chosen),1);}
+  pendingCards=cardNations.map((n,i)=>({teamName:n.name,cc:n.cc,card:chosenCards[i]}));
+  const hostNation=pick(ALL_NATIONS);S.hostNation=hostNation.name;
+  // Run qualifying: pass all star+card team names as guaranteed
+  const allStarTeams=[...S.activeStars.map(s=>s.teamName),...pendingNewStars.map(s=>s.teamName)];
+  const allCardTeams=pendingCards.map(c=>c.teamName);
+  const{qualified,confResults,finalList}=runQualifying(S.hostNation,allStarTeams,allCardTeams);
+  pendingQualified=finalList;S.qualifiedNations=finalList;
+  // Build modal queue: host → ratings → stars (name them) → cards → qualifying → draw
+  modalQueue=[];
+  modalQueue.push({type:"host",host:S.hostNation,hostCc:hostNation.cc});
+  modalQueue.push({type:"ratings",retired});
+  pendingNewStars.forEach((st,i)=>modalQueue.push({type:"star",star:st,idx:i,total:pendingNewStars.length}));
+  modalQueue.push({type:"cards",cards:pendingCards});
+  modalQueue.push({type:"qualifying",confResults,qualified,host:S.hostNation});
+  modalIdx=0;
+  document.getElementById("modal-overlay").classList.remove("hidden");
+  renderModal();
+}
+function renderModal(){
+  const step=modalQueue[modalIdx];const total=modalQueue.length;
+  const pr=document.getElementById("prog-row");pr.innerHTML="";
+  for(let i=0;i<total;i++){const d=document.createElement("div");d.className="prog-dot"+(i<modalIdx?" done":i===modalIdx?" active":"");pr.appendChild(d);}
+  const skip=document.getElementById("modal-skip");const next=document.getElementById("modal-btn");skip.style.display="none";
+  if(step.type==="host"){
+    document.getElementById("modal-title").textContent="WORLD CUP #"+S.wcNumber;
+    document.getElementById("modal-sub").textContent="The host nation has been selected";next.textContent="NEXT →";
+    document.getElementById("modal-body").innerHTML=`<div class="host-banner"><div class="host-title">WORLD CUP #${S.wcNumber} HOST</div><div style="font-size:44px;margin:8px 0">${fi(step.hostCc)}</div><div class="host-name">${step.host}</div><div style="font-size:12px;color:var(--txt2);margin-top:6px">Automatically qualified · Reduced confederation slots</div></div>`;
+  } else if(step.type==="ratings"){
+    document.getElementById("modal-title").textContent="NATION RATINGS";document.getElementById("modal-sub").textContent="Updated ratings for WC #"+S.wcNumber+" (Top 20 + big swings)";next.textContent="NEXT →";
+    const rows=ALL_NATIONS.map(n=>{const m=teamMeta[n.name]||{};const prev=+(m.prevRating||n.base).toFixed(1);const base=n.base;const hist=m.historyPts||0;const next=+(m.nextRating||n.base).toFixed(1);return{name:n.name,cc:n.cc,prev,base,hist,next,swing:+(next-prev).toFixed(1)};});
+    const sorted=[...rows].sort((a,b)=>b.next-a.next);const top20=sorted.slice(0,20);const big=sorted.slice(20).filter(r=>Math.abs(r.swing)>=5);const display=[...top20,...big];
+    const ret=step.retired?.length?`<div class="retire-notice">🎖️ Retiring: ${step.retired.map(s=>`<b>${s.name}</b> (${s.teamName}, ${s.pos})`).join(" · ")}</div>`:"";
+    document.getElementById("modal-body").innerHTML=ret+`<div style="max-height:340px;overflow-y:auto"><table class="rtable"><thead><tr><th>Nation</th><th>Prior</th><th>Base</th><th>Hist</th><th>Current</th><th>Δ</th></tr></thead><tbody>${display.map(r=>{const dc=r.swing>0?"delta-pos":r.swing<0?"delta-neg":"delta-neu";const ds=r.swing>0?"+"+r.swing:r.swing===0?"—":String(r.swing);return`<tr class="${Math.abs(r.swing)>=6?'big-swing':''}"><td><div style="display:flex;align-items:center">${fi(r.cc,true)}<span style="margin-left:4px">${r.name}</span></div></td><td>${r.prev}</td><td style="color:var(--txt3)">${r.base}</td><td style="color:#7c9ef5">${r.hist}</td><td style="font-weight:500">${r.next}</td><td class="${dc}">${ds}</td></tr>`;}).join("")}</tbody></table></div>`;
+  } else if(step.type==="star"){
+    const st=step.star;const pe=getStarFx(st)||{lines:[],fx:{}};
+    document.getElementById("modal-title").textContent="NEW STAR "+( step.idx+1)+" OF "+step.total;document.getElementById("modal-sub").textContent="A new "+st.pos+" has emerged for "+st.teamName+".";skip.style.display="inline-block";next.textContent="CONFIRM";
+    const end=st.wcStart+st.lifespan-1;
+    document.getElementById("modal-body").innerHTML=`<div class="modal-sec"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px">${fi(st.cc)}<span style="font-family:'Bebas Neue',sans-serif;font-size:18px">${st.teamName}</span><span class="pill pill-${st.pos}" style="margin-left:4px">${st.pos}</span><span style="font-size:11px;color:var(--txt3);margin-left:auto">${st.lifespan} WC career (WC${st.wcStart}–${end})</span></div><div class="modal-lbl">Player Name <span style="font-size:10px;color:var(--txt3)">(auto-generated — edit if you wish)</span></div><input class="inp" id="star-inp" value="${st.name}" onkeydown="if(event.key==='Enter')modalNext()"><div style="margin-top:10px"><div class="modal-lbl" style="margin-bottom:4px">Effects</div>${pe.lines.map(l=>`<div class="fx-line">+ ${l}</div>`).join("")}</div><div style="margin-top:8px"><div class="modal-lbl" style="margin-bottom:4px">Career</div><div class="wcs-pip">${Array.from({length:st.lifespan},(_,i)=>`<div class="pip ${i===0?'active':'future'}" title="WC #${st.wcStart+i}"></div>`).join("")}</div></div></div>`;
+    setTimeout(()=>document.getElementById("star-inp")?.focus(),50);
+  } else if(step.type==="cards"){
+    document.getElementById("modal-title").textContent="TACTICAL CARDS";document.getElementById("modal-sub").textContent="5 teams received tactical abilities for this tournament.";next.textContent="NEXT →";
+    document.getElementById("modal-body").innerHTML=`<div style="display:flex;flex-direction:column;gap:7px">${step.cards.map(c=>`<div class="card-prev"><div class="row" style="margin-bottom:5px">${fi(c.cc)}<span style="font-size:13px;font-weight:500">${c.teamName}</span><span class="pill pill-card${c.card.tier==='rare'?'-rare':c.card.tier==='legendary'?'-legendary':''}" style="margin-left:auto">${c.card.tier==='legendary'?'🟠 ':c.card.tier==='rare'?'🟣 ':''}${c.card.name}</span></div><div style="font-size:12px;color:var(--txt3)">${c.card.desc}</div></div>`).join("")}</div>`;
+  } else if(step.type==="qualifying"){
+    document.getElementById("modal-title").textContent="QUALIFYING RESULTS";document.getElementById("modal-sub").textContent="48 nations qualified for World Cup #"+S.wcNumber;next.textContent="START THE DRAW →";
+    const confs=["UEFA","CONMEBOL","CONCACAF","CAF","AFC","OFC"];
+    const hostConf=ALL_NATIONS.find(n=>n.name===step.host)?.conf||"UEFA";
+    let html=`<div style="max-height:400px;overflow-y:auto"><div class="conf-grid">`;
+    confs.forEach(conf=>{
+      const pool=ALL_NATIONS.filter(n=>n.conf===conf);
+      const isHostConf=conf===hostConf;
+      const baseSlots=CONF_SLOTS[conf];
+      const slots=baseSlots-(isHostConf?1:0);
+      const qualCount=pool.filter(n=>step.qualified.has(n.name)).length;
+      html+=`<div class="conf-card"><div class="conf-title">${conf}</div><div class="conf-slots">${qualCount} qualified${isHostConf?" (incl. 🏠 host)":""} / ${pool.length} nations</div>`;
+      pool.forEach(n=>{const isHost=n.name===step.host;const isIn=step.qualified.has(n.name);const meta=teamMeta[n.name]||{};
+        html+=`<div class="qual-row"><div class="qual-dot ${isHost?'dot-host':isIn?'dot-yes':'dot-no'}"></div>${fi(n.cc,true)}<span class="qual-name">${n.name}${isHost?" 🏠":""}</span><span class="qual-rating">${Math.round(meta.nextRating||n.base)}</span></div>`;});
+      html+=`</div>`;
+    });
+    html+=`</div></div>`;
+    document.getElementById("modal-body").innerHTML=html;
+  }
+}
+function modalNext(){const step=modalQueue[modalIdx];if(step.type==="star"){const v=(document.getElementById("star-inp")?.value||"").trim();step.star.name=v||step.star.name||getStarName(step.star.teamName);}modalIdx++;if(modalIdx>=modalQueue.length){document.getElementById("modal-overlay").classList.add("hidden");launchTournament();}else renderModal();}
+function modalSkipAll(){modalQueue.forEach(step=>{if(step.type==="star"&&!step.star.name)step.star.name=getStarName(step.star.teamName);});document.getElementById("modal-overlay").classList.add("hidden");launchTournament();}
+
+function launchTournament(){
+  pendingNewStars.forEach(st=>{if(!st.name)st.name="Unknown Star";S.activeStars.push(st);});
+  S.teams=pendingQualified.map(n=>{const meta=teamMeta[n.name]||{};const stats=genStats(meta.nextRating||n.base);return{name:n.name,cc:n.cc,conf:n.conf,...stats,w:0,d:0,l:0,gf:0,ga:0,pts:0,star:null,tacCard:null,isHost:n.name===S.hostNation};});
+  S.activeStars.forEach(st=>{const t=S.teams.find(t=>t.name===st.teamName);if(t)t.star=st;});
+  S.tacCards=pendingCards;S.tacCards.forEach(tc=>{const t=S.teams.find(t=>t.name===tc.teamName);if(t)t.tacCard=tc.card;});
+  S.groups=[];S.groupMatches=[];S.knockoutRounds=[];S.phase="groups";S.champion=null;S.roundReached={};
+  buildGroups();buildGroupMatches();
+  document.getElementById("btn-play").disabled=false;document.getElementById("btn-newwc").disabled=true;
+  document.getElementById("wc-edition").textContent="EDITION #"+S.wcNumber;
+  setPhase("groups",S.groupMatches.length+" group matches to play");
+  renderGroups();renderBracket();renderNations();renderSC();renderResults();
+  document.getElementById("play-area").innerHTML="";showUpcoming();
+  toast("WC #"+S.wcNumber+" — draw complete! Let's play.");
+}
+
+// RENDER
+function setPhase(ph,info){const lbl={groups:"GROUP STAGE",knockout:"KNOCKOUT STAGE",done:"TOURNAMENT COMPLETE",idle:"READY"};document.getElementById("phase-label").textContent=lbl[ph]||ph.toUpperCase();document.getElementById("phase-info").textContent=info||"";}
+function showUpcoming(){
+  let html="",pending=[],rname="";
+  if(S.phase==="groups"){pending=S.groupMatches.filter(m=>!m.played).slice(0,3);rname="GROUP STAGE";}
+  else if(S.phase==="knockout"){const r=S.knockoutRounds[S.knockoutRounds.length-1];if(r){pending=r.matches.filter(m=>!m.played).slice(0,3);rname=r.name.toUpperCase();}}
+  if(pending.length){html=`<div class="sec">UPCOMING — ${rname}</div>`;pending.forEach(m=>{const e1=getEff(m.t1),e2=getEff(m.t2);html+=`<div class="match-card"><div class="match-teams"><div class="match-team">${fi(m.t1.cc)}<div class="match-team-name">${m.t1.name}${m.t1.isHost?" 🏠":""}</div><div class="match-ovr">${ovr(e1)}</div>${m.t1.star?`<div style="font-size:10px;color:var(--acc)">⭐ ${m.t1.star.name} (${m.t1.star.pos})</div>`:""}${m.t1.tacCard?`<div style="font-size:10px;color:var(--blue)">🃏 ${m.t1.tacCard.name}</div>`:""}</div><div class="match-vs">VS</div><div class="match-team">${fi(m.t2.cc)}<div class="match-team-name">${m.t2.name}${m.t2.isHost?" 🏠":""}</div><div class="match-ovr">${ovr(e2)}</div>${m.t2.star?`<div style="font-size:10px;color:var(--acc)">⭐ ${m.t2.star.name} (${m.t2.star.pos})</div>`:""}${m.t2.tacCard?`<div style="font-size:10px;color:var(--blue)">🃏 ${m.t2.tacCard.name}</div>`:""}</div></div>${m.gi!=null?`<div style="font-size:11px;color:var(--txt3);text-align:center;margin-top:5px">Group ${S.groups[m.gi].name}</div>`:""}</div>`;});}
+  // Live group standings for next match's group (group stage only)
+  if(S.phase==="groups"&&pending.length&&pending[0].gi!=null){
+    const grp=S.groups[pending[0].gi];
+    if(grp){
+      const s=standingsOf(grp);
+      const played=S.groupMatches.filter(m=>m.gi===pending[0].gi&&m.played).length;
+      html+=`<div class="sec" style="margin-top:14px">GROUP ${grp.name} STANDINGS</div><div class="group-card" style="margin:0"><table class="gtable"><thead><tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead><tbody>`;
+      s.forEach((t,i)=>{const p=t.w+t.d+t.l;const hl=i<2?"q1":"";html+=`<tr class="${hl}"><td><div class="tncell">${fi(t.cc,true)}<span style="margin-left:2px">${t.name}</span>${t.isHost?'<span style="font-size:9px"> 🏠</span>':""}${t.star?'<span style="color:var(--acc);font-size:9px"> ⭐</span>':""}${t.tacCard?'<span style="color:var(--blue);font-size:9px"> 🃏</span>':""}</div></td><td>${p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf-t.ga>0?"+":""}${t.gf-t.ga}</td><td><b>${t.pts}</b></td></tr>`;});
+      html+=`</tbody></table><div style="font-size:10px;color:var(--txt3);padding:5px 8px">${played}/6 matches played</div></div>`;
+    }
+  }
+  document.getElementById("play-area").innerHTML=html;
+}
+function renderResults(){
+  const played=S.allMatchResults;
+  if(!played.length){document.getElementById("results-container").innerHTML=`<div class="empty">Play some matches to see results</div>`;return;}
+
+  // --- Compute awards ---
+  // Star scorers ranked
+  const starScorers=[...S.activeStars].sort((a,b)=>(b.goals||0)-(a.goals||0)).filter(s=>(s.goals||0)>0);
+  // Best player by rating
+  const starRated=[...S.activeStars].filter(s=>s.ratings?.length).map(s=>({st:s,r:s.ratings.reduce((a,b)=>a+b,0)/s.ratings.length})).sort((a,b)=>b.r-a.r);
+  // Best defender (GK/DEF) by rating
+  const defRated=starRated.filter(x=>x.st.pos==="GK"||x.st.pos==="DEF");
+  // Team goals scored
+  const teamGoalsList=Object.entries(S.teamGoals).sort((a,b)=>b[1]-a[1]);
+  // Team goals conceded
+  const teamConcedeList=Object.entries(S.teamGoalsConceded).sort((a,b)=>a[1]-b[1]);
+  // Shots per game
+  const teamShotsPg=Object.entries(S.teamShots).map(([n,s])=>[n,+(s/(S.teamMatchCount[n]||1)).toFixed(1)]).sort((a,b)=>b[1]-a[1]);
+  const teamShotsLeast=Object.entries(S.teamShots).map(([n,s])=>[n,+(s/(S.teamMatchCount[n]||1)).toFixed(1)]).sort((a,b)=>a[1]-b[1]);
+  // Possession per game
+  const teamPossPg=Object.entries(S.teamPoss).map(([n,p])=>[n,+(p/(S.teamMatchCount[n]||1)).toFixed(1)]).sort((a,b)=>b[1]-a[1]);
+  const teamPossLeast=Object.entries(S.teamPoss).map(([n,p])=>[n,+(p/(S.teamMatchCount[n]||1)).toFixed(1)]).sort((a,b)=>a[1]-b[1]);
+
+  const teamCc=name=>S.teams.find(t=>t.name===name)?.cc||"";
+
+  // Build an award card: title, icon, top3 array [{val, label, sub}]
+  function awardCard(icon,title,top3,valSuffix="",color="var(--acc)"){
+    if(!top3.length)return"";
+    const [f,...rest]=top3;
+    let h=`<div class="stat-highlight" style="min-width:0">`;
+    h+=`<div style="font-size:10px;color:var(--txt3);letter-spacing:.07em;margin-bottom:3px">${icon} ${title}</div>`;
+    h+=`<div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${color};line-height:1">${f.val}${valSuffix}</div>`;
+    h+=`<div style="font-size:12px;color:var(--txt2);margin:3px 0 5px">${f.label}</div>`;
+    if(f.sub)h+=`<div style="font-size:10px;color:var(--txt3);margin-bottom:4px">${f.sub}</div>`;
+    rest.forEach((r,i)=>{
+      h+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-top:1px solid #1e1e1e;font-size:11px"><span style="color:var(--txt3)">${i+2}. ${r.label}</span><span style="font-family:'Bebas Neue',sans-serif;color:var(--txt2)">${r.val}${valSuffix}</span></div>`;
+    });
+    h+=`</div>`;
+    return h;
+  }
+
+  let html=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:8px;margin-bottom:14px">`;
+
+  // ⭐ Top Star Scorer
+  html+=awardCard("⭐","TOP STAR SCORER",
+    starScorers.slice(0,3).map(s=>({val:s.goals,label:s.name,sub:`${s.pos} · ${s.teamName}`})));
+
+  // 🏆 Best Player (rating)
+  html+=awardCard("🏆","BEST PLAYER",
+    starRated.slice(0,3).map(x=>({val:x.r.toFixed(1),label:x.st.name,sub:`${x.st.pos} · ${x.st.teamName}`})));
+
+  // 🛡️ Best Defender
+  html+=awardCard("🛡️","BEST DEFENDER",
+    defRated.slice(0,3).map(x=>({val:x.r.toFixed(1),label:x.st.name,sub:`${x.st.pos} · ${x.st.teamName}`})),"","var(--grn)");
+
+  // ⚽ Most Goals Scored
+  html+=awardCard("⚽","TOP ATTACK",
+    teamGoalsList.slice(0,3).map(([n,g])=>({val:g,label:`${fi(teamCc(n),true)}${n}`}))," g");
+
+  // 🧱 Best Defense (fewest goals conceded)
+  html+=awardCard("🧱","BEST DEFENSE",
+    teamConcedeList.slice(0,3).map(([n,g])=>({val:g,label:`${fi(teamCc(n),true)}${n}`}))," gc","var(--grn)");
+
+  // 🎯 Most Shots/game
+  html+=awardCard("🎯","SHOTS / GAME ↑",
+    teamShotsPg.slice(0,3).map(([n,s])=>({val:s,label:`${fi(teamCc(n),true)}${n}`})));
+
+  // 🐢 Fewest Shots/game
+  html+=awardCard("🐢","SHOTS / GAME ↓",
+    teamShotsLeast.slice(0,3).map(([n,s])=>({val:s,label:`${fi(teamCc(n),true)}${n}`})),"","var(--txt2)");
+
+  // 🔵 Most Possession/game
+  html+=awardCard("🔵","POSSESSION ↑",
+    teamPossPg.slice(0,3).map(([n,p])=>({val:p,label:`${fi(teamCc(n),true)}${n}`})),"%");
+
+  // ⚪ Least Possession/game
+  html+=awardCard("⚪","POSSESSION ↓",
+    teamPossLeast.slice(0,3).map(([n,p])=>({val:p,label:`${fi(teamCc(n),true)}${n}`})),"%","var(--txt2)");
+
+  html+=`</div><div class="sec">MATCH RESULTS (${played.length} played)</div>`;
+  [...played].reverse().forEach(m=>{
+    const t1=S.teams.find(t=>t.name===m.t1),t2=S.teams.find(t=>t.name===m.t2);
+    // Only show star scorers in the result card, not generic names
+    const starNames=new Set(S.activeStars.map(s=>s.name));
+    const sc1Stars=m.sc1?.filter(n=>starNames.has(n))||[];
+    const sc2Stars=m.sc2?.filter(n=>starNames.has(n))||[];
+    const scLine=(sc1Stars.length||sc2Stars.length)?` · ⭐ ${sc1Stars.join(", ")||"—"} | ${sc2Stars.join(", ")||"—"}`:"";
+    html+=`<div class="res-card"><div class="res-team">${fi(t1?.cc||"",true)}<span>${m.t1}</span></div><div class="res-score">${m.g1} — ${m.g2}${m.pens?`<br><span style="font-size:9px;color:var(--txt3)">pens</span>`:""}</div><div class="res-team r"><span>${m.t2}</span>${fi(t2?.cc||"",true)}</div><div class="res-meta">${m.phase||""}${scLine}</div></div>`;
+  });
+  document.getElementById("results-container").innerHTML=html;
+}
+function renderGroups(){
+  if(!S.groups.length){document.getElementById("groups-container").innerHTML=`<div class="empty">Start a tournament to see groups</div>`;return;}
+  let html=`<div class="groups-grid">`;
+  S.groups.forEach(grp=>{const s=standingsOf(grp);html+=`<div class="group-card"><div class="group-title">GROUP ${grp.name}</div><table class="gtable"><thead><tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead><tbody>`;s.forEach((t,i)=>{const p=t.w+t.d+t.l;html+=`<tr class="${i<2?'q1':''}"><td><div class="tncell">${fi(t.cc,true)}<span style="margin-left:2px">${t.name}</span>${t.isHost?`<span style="font-size:9px">🏠</span>`:""}${t.star?`<span style="color:var(--acc);font-size:9px">⭐</span>`:""}${t.tacCard?`<span style="color:var(--blue);font-size:9px">🃏</span>`:""}</div></td><td>${p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf-t.ga>0?"+":""}${t.gf-t.ga}</td><td><b>${t.pts}</b></td></tr>`;});html+=`</tbody></table></div>`;});
+  document.getElementById("groups-container").innerHTML=html+"</div>";
+}
+function renderBracket(){
+  if(!S.knockoutRounds.length){document.getElementById("bracket-container").innerHTML=`<div class="empty">Knockout stage not started yet</div>`;return;}
+  let html="";S.knockoutRounds.forEach(round=>{html+=`<div class="bracket-round"><div class="brt">${round.name}</div><div class="bracket-matches">`;round.matches.forEach(m=>{const starCard=(t)=>(t.star?`<span style="color:var(--acc);font-size:9px"> ⭐</span>`:"")+(t.tacCard?`<span style="color:var(--blue);font-size:9px"> 🃏</span>`:"");if(!m.played){html+=`<div class="bmatch"><div class="bmatch-row"><span class="bmn">${fi(m.t1.cc,true)}${m.t1.name}${starCard(m.t1)}</span><span class="bms" style="color:var(--txt3)">-</span></div><div class="bmatch-row"><span class="bmn">${fi(m.t2.cc,true)}${m.t2.name}${starCard(m.t2)}</span><span class="bms" style="color:var(--txt3)">-</span></div></div>`;}else{const r=m.result;const c1=r.winner===m.t1?"winner":"loser",c2=r.winner===m.t2?"winner":"loser";html+=`<div class="bmatch"><div class="bmatch-row ${c1}"><span class="bmn">${fi(m.t1.cc,true)}${m.t1.name}${starCard(m.t1)}</span><span class="bms">${r.g1}</span></div><div class="bmatch-row ${c2}"><span class="bmn">${fi(m.t2.cc,true)}${m.t2.name}${starCard(m.t2)}</span><span class="bms">${r.g2}</span></div>${r.pens?`<div style="font-size:9px;color:var(--txt3);text-align:center;margin-top:1px">${r.pens}</div>`:""}</div>`;}});html+=`</div></div>`;});
+  document.getElementById("bracket-container").innerHTML=html;
+}
+function renderSC(){
+  if(!S.activeStars.length&&!S.tacCards.length){document.getElementById("sc-container").innerHTML=`<div class="empty">Start a tournament to see Stars &amp; Cards</div>`;return;}
+  let html=`<div class="sec" style="color:var(--acc)">⭐ ACTIVE STAR PLAYERS (${S.activeStars.length}/8)</div><div class="sc-grid">`;
+  S.activeStars.forEach(st=>{const pe=getStarFx(st)||{lines:[],fx:{}};const end=st.wcStart+st.lifespan-1;const pips=Array.from({length:st.lifespan},(_,i)=>{const wc=st.wcStart+i;const cls=wc<S.wcNumber?"played":wc===S.wcNumber?"active":"future";return`<div class="pip ${cls}" title="WC #${wc}"></div>`;}).join("");const avgRat=st.ratings?.length?(st.ratings.reduce((a,b)=>a+b,0)/st.ratings.length).toFixed(1):"—";const tierLabel=st.tier==='legendary'?'🟠 LEGEND':st.tier==='rare'?'🟣 RARE':'STAR';const tierPill=st.tier==='legendary'?'pill-star-legendary':st.tier==='rare'?'pill-star-rare':'pill-star-common';html+=`<div class="star-card"><div class="row" style="flex-wrap:wrap;gap:3px"><span class="pill ${tierPill}">${tierLabel}</span><span class="pill pill-${st.pos}">${st.pos}</span><span style="font-size:10px;color:var(--txt3);margin-left:auto">WC${st.wcStart}–${end}</span></div><div class="sc-name">${st.name}</div><div class="sc-team">${fi(st.cc)}${st.teamName}</div><div class="sc-career">Goals: <span>${st.goals||0}</span> · Wins: <span>${st.wins||0}</span> · Rating: <span>${avgRat}</span></div><div class="wcs-pip">${pips}</div><div class="sc-fx" style="margin-top:5px">${pe.lines.map(l=>`<b>+</b> ${l}<br>`).join("")}</div></div>`;});html+=`</div>`;
+  if(S.tacCards.length){html+=`<div class="sec" style="color:var(--blue)">🃏 TACTICAL CARDS THIS EDITION</div><div class="sc-grid">`;S.tacCards.forEach(tc=>{const tcTier=tc.card.tier||"common";const tcPill=tcTier==="legendary"?"pill-card-legendary":tcTier==="rare"?"pill-card-rare":"pill-card";const tcLabel=tcTier==="legendary"?"🟠 LEGENDARY":tcTier==="rare"?"🟣 RARE":"🃏 COMMON";html+=`<div class="tac-card-box"><div class="row" style="margin-bottom:2px"><span class="pill ${tcPill}">${tcLabel}</span></div><div class="tac-name">${tc.card.name}</div><div class="sc-team">${fi(tc.cc)}${tc.teamName}</div><div class="tac-desc">${tc.card.desc}</div></div>`;});html+=`</div>`;}
+  document.getElementById("sc-container").innerHTML=html;
+}
+function renderNations(){
+  const sort=document.getElementById("sort-teams").value;
+  const rows=ALL_NATIONS.map(n=>{const m=teamMeta[n.name]||{};const prev=Math.round(m.prevRating||n.base);const base=n.base;const hist=calcHistoryComponent(n.name);const next=Math.round(m.nextRating||n.base);return{name:n.name,cc:n.cc,conf:n.conf,prev,base,hist,next,swing:Math.round(next-prev)};});
+  if(sort==="next")rows.sort((a,b)=>b.next-a.next);else if(sort==="base")rows.sort((a,b)=>b.base-a.base);else rows.sort((a,b)=>a.name.localeCompare(b.name));
+  let html=`<div style="overflow-x:auto"><table class="rtable"><thead><tr><th style="text-align:left">Nation</th><th style="text-align:left">Conf</th><th>Prior</th><th>Base</th><th>Hist</th><th>Current</th><th>Δ</th></tr></thead><tbody>`;
+  rows.forEach(r=>{const dc=r.swing>0?"delta-pos":r.swing<0?"delta-neg":"delta-neu";const ds=r.swing>0?"+"+r.swing:r.swing===0?"—":String(r.swing);html+=`<tr class="${Math.abs(r.swing)>=6?'big-swing':''}"><td><div style="display:flex;align-items:center">${fi(r.cc,true)}<span style="margin-left:5px">${r.name}</span></div></td><td style="text-align:left;color:var(--txt3);font-size:11px">${r.conf}</td><td>${r.prev}</td><td style="color:var(--txt3)">${r.base}</td><td style="color:#7c9ef5">${r.hist}</td><td style="font-weight:500">${r.next}</td><td class="${dc}">${ds}</td></tr>`;});
+  html+=`</tbody></table></div>`;document.getElementById("teams-container").innerHTML=html;
+}
+function switchHistSub(sub){
+  document.getElementById("history-sub-teams").style.display=sub==="teams"?"":"none";
+  document.getElementById("history-sub-players").style.display=sub==="players"?"":"none";
+  document.querySelectorAll(".hist-sub").forEach(b=>b.classList.remove("active"));
+  document.getElementById("hsub-"+sub).classList.add("active");
+}
+function renderHistory(){
+  document.getElementById("history-count").textContent=allHistory.length+" editions";
+  if(!allHistory.length){
+    document.getElementById("history-sub-teams").innerHTML=`<div class="empty">No history yet.</div>`;
+    document.getElementById("history-sub-players").innerHTML=`<div class="empty">No history yet.</div>`;
+    return;
+  }
+  // Aggregation
+  const titles={},podiumGold={},podiumSilver={},podiumBronze={};
+  const teamTotalGoals={},teamTotalWins={};
+  const sWins={},sGames={},sCareerGoals={};
+  const sAllRatings={},sDefRatings={};
+  const mvpWins={},scorerWins={},defWins={};
+  const starMedals={}; // {gold,silver,bronze} per star name
+
+  allHistory.forEach(h=>{
+    // Nation medal counts (1st/2nd/3rd only)
+    podiumGold[h.champion]=(podiumGold[h.champion]||0)+1;
+    titles[h.champion]=(titles[h.champion]||0)+1;
+    if(h.runnerUp?.name)podiumSilver[h.runnerUp.name]=(podiumSilver[h.runnerUp.name]||0)+1;
+    if(h.thirdPlace?.name)podiumBronze[h.thirdPlace.name]=(podiumBronze[h.thirdPlace.name]||0)+1;
+    if(h.topScoringTeam?.name){const t=h.topScoringTeam;teamTotalGoals[t.name]=(teamTotalGoals[t.name]||0)+t.goals;}
+    if(h.topWinsTeam?.name){const t=h.topWinsTeam;teamTotalWins[t.name]=(teamTotalWins[t.name]||0)+t.wins;}
+    // Stars
+    if(h.stars)h.stars.forEach(st=>{
+      sWins[st.name]=(sWins[st.name]||0)+(st.wins||0);
+      sGames[st.name]=(sGames[st.name]||0)+(st.wcsPlayed||1);
+      sCareerGoals[st.name]=(sCareerGoals[st.name]||0)+(st.goals||0);
+      if(st.wcRating>0){
+        if(!sAllRatings[st.name])sAllRatings[st.name]=[];
+        sAllRatings[st.name].push({wc:h.edition,rating:st.wcRating});
+        if(st.pos==="GK"||st.pos==="DEF"){if(!sDefRatings[st.name])sDefRatings[st.name]=[];sDefRatings[st.name].push({wc:h.edition,rating:st.wcRating});}
+      }
+      if(st.medals){
+        if(!starMedals[st.name])starMedals[st.name]={gold:0,silver:0,bronze:0};
+        starMedals[st.name].gold+=st.medals.gold||0;
+        starMedals[st.name].silver+=st.medals.silver||0;
+        starMedals[st.name].bronze+=st.medals.bronze||0;
+      }
+    });
+    if(h.mvp?.name)mvpWins[h.mvp.name]=(mvpWins[h.mvp.name]||0)+1;
+    if(h.topScorerAward?.name)scorerWins[h.topScorerAward.name]=(scorerWins[h.topScorerAward.name]||0)+1;
+    if(h.defMvp?.name)defWins[h.defMvp.name]=(defWins[h.defMvp.name]||0)+1;
+  });
+
+  const bestSingleSeason=Object.entries(sAllRatings).map(([name,arr])=>{const best=[...arr].sort((a,b)=>b.rating-a.rating)[0];return{name,rating:best.rating,wc:best.wc};}).sort((a,b)=>b.rating-a.rating);
+  const bestCareerAvg=Object.entries(sAllRatings).map(([name,arr])=>{const avg=arr.reduce((s,x)=>s+x.rating,0)/arr.length;return{name,avg:+avg.toFixed(2),wcs:arr.length};}).sort((a,b)=>b.avg-a.avg);
+  const bestDefSingle=Object.entries(sDefRatings).map(([name,arr])=>{const best=[...arr].sort((a,b)=>b.rating-a.rating)[0];return{name,rating:best.rating,wc:best.wc};}).sort((a,b)=>b.rating-a.rating);
+  // Star medal leaderboard: sort by gold then silver then bronze
+  const starMedalList=Object.entries(starMedals).map(([name,m])=>({name,...m,total:m.gold+m.silver+m.bronze})).filter(x=>x.total>0).sort((a,b)=>b.gold-a.gold||b.silver-a.silver||b.bronze-a.bronze);
+
+  const top5=(obj,suf)=>Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,v],i)=>`<div class="hof-row"><span class="hof-rank">${i+1}</span><span style="flex:1">${n}</span><span class="hof-val">${v}${suf}</span></div>`).join("")||`<div class="hof-row" style="color:var(--txt3)">—</div>`;
+  const topList=(arr,key,suf,extra)=>arr.slice(0,5).map((x,i)=>`<div class="hof-row"><span class="hof-rank">${i+1}</span><span style="flex:1">${x.name}${extra?`<span style="font-size:10px;color:var(--txt3)"> (${extra(x)})</span>`:""}</span><span class="hof-val">${typeof x[key]==="number"&&x[key].toFixed?x[key].toFixed(2):x[key]}${suf}</span></div>`).join("")||`<div class="hof-row" style="color:var(--txt3)">—</div>`;
+
+  // TEAMS sub-tab
+  // Nation medal table: rows = nations, cols = gold/silver/bronze, sorted by gold desc
+  const medalNations={};
+  Object.entries(podiumGold).forEach(([n,g])=>{if(!medalNations[n])medalNations[n]={g:0,s:0,b:0};medalNations[n].g=g;});
+  Object.entries(podiumSilver).forEach(([n,s])=>{if(!medalNations[n])medalNations[n]={g:0,s:0,b:0};medalNations[n].s=s;});
+  Object.entries(podiumBronze).forEach(([n,b])=>{if(!medalNations[n])medalNations[n]={g:0,s:0,b:0};medalNations[n].b=b;});
+  const medalTable=Object.entries(medalNations).map(([name,m])=>({name,...m,total:m.g+m.s+m.b}))
+    .sort((a,b)=>b.g-a.g||b.s-a.s||b.b-a.b);
+  const medalTableHtml=medalTable.length?`
+    <table class="gtable" style="width:100%">
+      <thead><tr><th style="text-align:left">Nation</th><th>🥇</th><th>🥈</th><th>🥉</th><th>Total</th></tr></thead>
+      <tbody>${medalTable.map((x,i)=>`<tr>
+        <td><div class="tncell" style="font-size:12px"><span class="hof-rank" style="margin-right:4px">${i+1}</span>${x.name}</div></td>
+        <td style="text-align:center;font-weight:${x.g?'700':'400'};color:${x.g?'var(--acc)':'var(--txt3)'};">${x.g||'—'}</td>
+        <td style="text-align:center;color:${x.s?'#ccc':'var(--txt3)'};">${x.s||'—'}</td>
+        <td style="text-align:center;color:${x.b?'#cd7f32':'var(--txt3)'};">${x.b||'—'}</td>
+        <td style="text-align:center;color:var(--txt2)">${x.total}</td>
+      </tr>`).join('')}</tbody>
+    </table>`:`<div class="empty">No data yet</div>`;
+
+  let tHtml=`<div class="sec">MEDAL TABLE</div><div style="margin-bottom:14px">${medalTableHtml}</div>`;
+  tHtml+=`<div class="sec">ALL-TIME STATS</div><div class="hof-grid">
+    <div class="hof-card"><div class="hof-title">⚽ Most Goals Scored</div>${top5(teamTotalGoals," g")}</div>
+    <div class="hof-card"><div class="hof-title">🏅 Most Games Won</div>${top5(teamTotalWins," W")}</div>
+  </div>`;
+  tHtml+=`<div class="sec">TOURNAMENT LOG</div>`;
+  allHistory.forEach((h,i)=>{
+    const podiumHtml=`<div class="wc-winner">${fi(h.cc,true)} ${h.champion} 🏆</div>
+      ${h.runnerUp?`<div class="wc-meta">🥈 ${fi(h.runnerUp.cc,true)} ${h.runnerUp.name}</div>`:""}
+      ${h.thirdPlace?`<div class="wc-meta">🥉 ${fi(h.thirdPlace.cc,true)} ${h.thirdPlace.name}</div>`:""}
+      ${h.fourthPlace?`<div class="wc-meta" style="color:var(--txt3)">4th: ${fi(h.fourthPlace.cc,true)} ${h.fourthPlace.name}</div>`:""}`;
+    const mvpLine=h.mvp?`<div class="wc-meta">🏆 MVP: ${h.mvp.name} (${h.mvp.rating})</div>`:"";
+    const scorerLine=h.topScorerAward?`<div class="wc-meta">⚽ Top Scorer: ${h.topScorerAward.name} (${h.topScorerAward.goals}g)</div>`:"";
+    const defLine=h.defMvp?`<div class="wc-meta">🛡️ Def MVP: ${h.defMvp.name} (${h.defMvp.rating})</div>`:"";
+    const winsLine=h.topWinsTeam?`<div class="wc-meta">🏅 Most wins: ${h.topWinsTeam.name} (${h.topWinsTeam.wins}W)</div>`:"";
+    const goalsLine=h.topScoringTeam?`<div class="wc-meta">⚽ Top attack: ${h.topScoringTeam.name} (${h.topScoringTeam.goals}g)</div>`:"";
+    tHtml+=`<div class="history-card" onclick="document.getElementById('hd-${i}').classList.toggle('open')">
+      <div class="row"><div class="wc-num">WC #${h.edition}</div><div class="spacer"></div><div style="font-size:11px;color:var(--txt3)">${h.totalMatches} matches · ${h.totalGoals} goals${h.host?` · 🏠 ${h.host}`:""}</div></div>
+      ${podiumHtml}${mvpLine}${scorerLine}${defLine}${winsLine}${goalsLine}
+      <div class="hd" id="hd-${i}">
+        ${h.cards?.length?`<div style="margin-top:7px"><div class="sec" style="margin-top:0;font-size:12px">Cards</div><div class="two-col">${h.cards.map(c=>`<div class="srow"><b>${c.card}</b> · ${c.team}</div>`).join("")}</div></div>`:""}
+      </div>
+    </div>`;
+  });
+  document.getElementById("history-sub-teams").innerHTML=tHtml;
+
+  // PLAYERS sub-tab
+  const medalRow=(x)=>`<div class="hof-row"><span class="hof-rank" style="font-size:9px">🥇${x.gold} 🥈${x.silver} 🥉${x.bronze}</span><span style="flex:1">${x.name}</span><span class="hof-val">${x.total} medals</span></div>`;
+  const starMedalTableHtml=starMedalList.length?`
+    <table class="gtable" style="width:100%">
+      <thead><tr><th style="text-align:left">Player</th><th>🥇</th><th>🥈</th><th>🥉</th><th>Total</th></tr></thead>
+      <tbody>${starMedalList.slice(0,10).map((x,i)=>`<tr>
+        <td style="font-size:12px"><span class="hof-rank" style="margin-right:4px">${i+1}</span>${x.name}</td>
+        <td style="text-align:center;font-weight:${x.gold?'700':'400'};color:${x.gold?'var(--acc)':'var(--txt3)'};">${x.gold||'—'}</td>
+        <td style="text-align:center;color:${x.silver?'#ccc':'var(--txt3)'};">${x.silver||'—'}</td>
+        <td style="text-align:center;color:${x.bronze?'#cd7f32':'var(--txt3)'};">${x.bronze||'—'}</td>
+        <td style="text-align:center;color:var(--txt2)">${x.total}</td>
+      </tr>`).join('')}</tbody>
+    </table>`:`<div class="empty">No data yet</div>`;
+  let pHtml=`<div class="sec">STAR PLAYERS — MEDAL TABLE</div><div style="margin-bottom:14px">${starMedalTableHtml}</div>`;
+  pHtml+=`<div class="sec">STAR PLAYERS — RATINGS</div><div class="hof-grid">
+    <div class="hof-card"><div class="hof-title">⭐ Best Single Season</div>${topList(bestSingleSeason,"rating","",x=>"WC#"+x.wc)}</div>
+    <div class="hof-card"><div class="hof-title">⭐ Best Career Avg</div>${topList(bestCareerAvg,"avg","",x=>x.wcs+" WCs")}</div>
+    <div class="hof-card"><div class="hof-title">🛡️ Best Def Season</div>${topList(bestDefSingle,"rating","",x=>"WC#"+x.wc)}</div>
+    <div class="hof-card"><div class="hof-title">⚽ Career Goals</div>${top5(sCareerGoals," g")}</div>
+  </div>`;
+  pHtml+=`<div class="sec">AWARD WINNERS — ALL TIME</div><div class="hof-grid">
+    <div class="hof-card"><div class="hof-title">🏆 Most MVP Awards</div>${top5(mvpWins,"×")}</div>
+    <div class="hof-card"><div class="hof-title">⚽ Most Top Scorer Awards</div>${top5(scorerWins,"×")}</div>
+    <div class="hof-card"><div class="hof-title">🛡️ Most Def MVP Awards</div>${top5(defWins,"×")}</div>
+    <div class="hof-card"><div class="hof-title">📅 Most WCs Played</div>${top5(sGames," WC")}</div>
+  </div>`;
+  // Star career log per edition
+  pHtml+=`<div class="sec">STAR CAREER LOG</div>`;
+  allHistory.forEach((h,i)=>{
+    pHtml+=`<div class="history-card" onclick="document.getElementById('sp-${i}').classList.toggle('open')">
+      <div class="row"><div class="wc-num">WC #${h.edition}</div><div class="spacer"></div><div style="font-size:11px;color:var(--txt3)">${fi(h.cc,true)} ${h.champion} 🏆</div></div>
+      <div class="hd" id="sp-${i}">
+        ${h.stars?.length?`<div class="two-col" style="margin-top:6px">${h.stars.map(s=>{const m=s.medals;const med=m?(m.gold?"🥇":m.silver?"🥈":m.bronze?"🥉":""):"";return`<div class="srow">${med} <b>${s.name}</b> (${s.pos}) · ${s.team} · ${s.goals}g · ${s.wcRating}</div>`}).join("")}</div>`:"<div style='color:var(--txt3);font-size:11px;padding:6px'>No stars this edition</div>"}
+      </div>
+    </div>`;
+  });
+  document.getElementById("history-sub-players").innerHTML=pHtml;
+}
+
+// ── Named Save Slots ──────────────────────────────────────────────────────
+function openSaveManager(){
+  document.getElementById("save-manager-overlay").style.display="flex";
+  // Pre-fill name suggestion
+  document.getElementById("save-name-inp").value="World "+S.wcNumber+" — WC#"+S.wcNumber;
+  renderSaveSlots();
+}
+function closeSaveManager(){document.getElementById("save-manager-overlay").style.display="none";}
+function saveNamedSlot(){
+  const name=(document.getElementById("save-name-inp").value||"").trim();
+  if(!name){toast("Enter a save name");return;}
+  const key="slot__"+name.replace(/[^a-zA-Z0-9 \-_#]/g,"_");
+  const data=buildSaveData();
+  data.key=key;data.slotName=name;
+  dbPut(key,data).then(()=>{toast("Saved: "+name);renderSaveSlots();}).catch(()=>toast("Save failed"));
+}
+function renderSaveSlots(){
+  const el=document.getElementById("save-slots-list");
+  el.innerHTML=`<div style="padding:8px 20px;font-size:11px;color:var(--txt3)">Loading saves...</div>`;
+  dbAll().then(all=>{
+    const slots=all.filter(s=>s.key&&s.key.startsWith("slot__")).sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
+    if(!slots.length){el.innerHTML=`<div style="padding:16px 20px;color:var(--txt3);font-size:13px">No saved worlds yet.</div>`;return;}
+    el.innerHTML=slots.map(s=>{
+      const d=s.savedAt?new Date(s.savedAt):null;
+      const ts=d?d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
+      return`<div style="padding:10px 20px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.slotName||s.key}</div>
+          <div style="font-size:11px;color:var(--txt3)">WC #${s.wcNumber||"?"} · ${s.allHistory?.length||0} editions · ${ts}</div>
+        </div>
+        <button class="btn btn-sm btn-grn" style="flex-shrink:0" onclick="loadSlot('${s.key}')">Load</button>
+        <button class="btn btn-sm" style="flex-shrink:0;background:#3a0a0a;color:#e05050;border:1px solid #6a1a1a" onclick="deleteSlot('${s.key}')">Del</button>
+      </div>`;
+    }).join("");
+  });
+}
+function loadSlot(key){
+  dbGet(key).then(d=>{
+    if(!d){toast("Save not found");return;}
+    // Full reset
+    S.teams=[];S.groups=[];S.groupMatches=[];S.knockoutRounds=[];
+    S.phase="idle";S.scorers={};S.champion=null;S.roundReached={};
+    S.hostNation=null;S.qualifiedNations=[];S.allMatchResults=[];
+    S.teamGoals={};S.teamGoalsConceded={};S.teamShots={};S.teamPoss={};S.teamMatchCount={};
+    allHistory=[];teamMeta={};
+    restoreSaveData(d);
+    saveLS();// write to autosave so on next reload it resumes this world
+    document.getElementById("wc-edition").textContent="EDITION #"+S.wcNumber;
+    resumeUI();renderAll();
+    closeSaveManager();
+    toast("Loaded: "+(d.slotName||key));
+  }).catch(()=>toast("Failed to load"));
+}
+function deleteSlot(key){
+  if(!confirm("Delete this save?"))return;
+  dbDelete(key).then(()=>{toast("Deleted");renderSaveSlots();});
+}
+
+</script>
+</body>
+</html>
