@@ -280,21 +280,6 @@ body{background:var(--g);color:var(--txt);font-family:'DM Sans',sans-serif;font-
     </div>
   </div>
 
-<!-- SAVE MANAGER MODAL -->
-<div id="save-manager-overlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px">
-  <div style="background:#141414;border:1px solid #333;border-radius:12px;width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column">
-    <div style="padding:16px 20px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--acc)">SAVE MANAGER</div>
-      <button onclick="closeSaveManager()" style="background:none;border:none;color:var(--txt3);font-size:20px;cursor:pointer">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1a1a1a;display:flex;gap:8px">
-      <input id="save-name-inp" class="inp" placeholder="Save name (e.g. World 1 - WC#6)" style="flex:1;font-size:13px">
-      <button class="btn btn-acc btn-sm" onclick="saveNamedSlot()">💾 Save</button>
-    </div>
-    <div id="save-slots-list" style="overflow-y:auto;flex:1;padding:8px 0"></div>
-  </div>
-</div>
-
 </div>
 
 <div class="modal-overlay hidden" id="modal-overlay">
@@ -1875,11 +1860,12 @@ function renderHistory(){
 
 // ── Named Save Slots ──────────────────────────────────────────────────────
 function openSaveManager(){
-  document.getElementById("save-manager-overlay").classList.remove("hidden");
+  const el=document.getElementById("save-manager-overlay");
+  el.style.display="flex";
   document.getElementById("save-name-inp").value="World "+S.wcNumber+" — WC#"+S.wcNumber;
   renderSaveSlots();
 }
-function closeSaveManager(){document.getElementById("save-manager-overlay").classList.add("hidden");}
+function closeSaveManager(){document.getElementById("save-manager-overlay").style.display="none";}
 function saveNamedSlot(){
   const name=(document.getElementById("save-name-inp").value||"").trim();
   if(!name){toast("Enter a save name");return;}
@@ -1931,5 +1917,19 @@ function deleteSlot(key){
 }
 
 </script>
+<!-- SAVE MANAGER MODAL - at body level so nothing blocks it -->
+<div id="save-manager-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:99999;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
+  <div style="background:#141414;border:1px solid #333;border-radius:12px;width:100%;max-width:420px;margin-top:20px;display:flex;flex-direction:column;max-height:calc(100vh - 40px)">
+    <div style="padding:16px 20px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--acc)">SAVE MANAGER</div>
+      <button onclick="closeSaveManager()" style="background:none;border:none;color:var(--txt3);font-size:24px;cursor:pointer;padding:4px 8px">✕</button>
+    </div>
+    <div style="padding:12px 20px;border-bottom:1px solid #1a1a1a;display:flex;gap:8px;flex-shrink:0">
+      <input id="save-name-inp" class="inp" placeholder="Save name (e.g. World 1 - WC#6)" style="flex:1;font-size:13px">
+      <button class="btn btn-acc btn-sm" onclick="saveNamedSlot()">💾 Save</button>
+    </div>
+    <div id="save-slots-list" style="overflow-y:auto;flex:1;padding:8px 0"></div>
+  </div>
+</div>
 </body>
 </html>
